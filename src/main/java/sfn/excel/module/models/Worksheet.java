@@ -5,12 +5,12 @@ import java.util.List;
 
 public class Worksheet {
     public String name = "";
-    public int sheedIndex = 0;
+    public int sheetIndex = 0;
     public List<List<String>> rows = new ArrayList();
 
-    public Worksheet(String name, int sheedIndex, List<List<String>> rows) {
+    public Worksheet(String name, int sheetIndex, List<List<String>> rows) {
         this.name = name;
-        this.sheedIndex = sheedIndex;
+        this.sheetIndex = sheetIndex;
         this.rows = rows;
     }
 }
