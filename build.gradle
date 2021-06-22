@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'sfn'
-version '1.0.53'
+version '1.0.54'
 
 java.sourceCompatibility = JavaVersion.VERSION_11
 java {
@@ -27,7 +27,7 @@ dependencies {
 
 jar {
     from {
-        configurations.runtimeClasspath.filter{ it.exists() }.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.runtimeClasspath.filter { it.exists() }.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 
