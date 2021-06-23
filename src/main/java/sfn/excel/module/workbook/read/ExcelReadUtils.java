@@ -1,12 +1,11 @@
-package sfn.excel.module;
+package sfn.excel.module.workbook.read;
 
-import sfn.excel.module.models.Workbook;
-import sfn.excel.module.models.Worksheet;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import sfn.excel.module.workbook.read.models.SimpleWorkbookModels;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,15 +13,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ExcelUtils {
-
-    public static String test() {
-        return "test method: sfn.excell.module.ExcelUtils.test();";
-    }
-
-
-    public static Workbook extractSimple(String workbookName, InputStream inputStream) throws IOException {
-        Workbook responseWorkbook = new Workbook(workbookName, new ArrayList<>());
+public class ExcelReadUtils {
+    public static SimpleWorkbookModels.Workbook extractSimple(
+            String workbookName, InputStream inputStream
+    ) throws IOException {
+        SimpleWorkbookModels.Workbook responseSimpleWorkbook =
+                new SimpleWorkbookModels.Workbook(workbookName, new ArrayList<>());
 
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
         DataFormatter dataFormatter = new DataFormatter();
@@ -34,8 +30,10 @@ public class ExcelUtils {
             Sheet sheet = sheetIterator.next();
 
             // response - sheet
-            Worksheet responseWorksheet = new Worksheet(sheet.getSheetName(), sheetIdx, new ArrayList<>());
-            responseWorkbook.worksheets.add(responseWorksheet);
+            SimpleWorkbookModels.Worksheet responseSimpleWorksheet = new SimpleWorkbookModels.Worksheet(
+                    sheet.getSheetName(), sheetIdx, new ArrayList<>()
+            );
+            responseSimpleWorkbook.worksheets.add(responseSimpleWorksheet);
 
             // rows
             Iterator<Row> rowIterator = sheet.rowIterator();
@@ -51,13 +49,13 @@ public class ExcelUtils {
                     responseRow.add(cellStringValue);
                 }
 
-                responseWorksheet.rows = responseRows;
+                responseSimpleWorksheet.rows = responseRows;
 
                 responseRows.add(responseRow);
             }
             sheetIdx += 1;
         }
 
-        return responseWorkbook;
+        return responseSimpleWorkbook;
     }
 }

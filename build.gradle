@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'sfn'
-version '1.0.54'
+version '1.0.102'
 
 java.sourceCompatibility = JavaVersion.VERSION_11
 java {
