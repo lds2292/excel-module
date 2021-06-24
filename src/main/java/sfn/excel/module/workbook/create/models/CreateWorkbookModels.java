@@ -15,7 +15,7 @@ public class CreateWorkbookModels {
         // header("이름", "주소", "순번", ...)
         public List<String> columnHeaderDisplayNames = new ArrayList<>();
 
-        // values grouped by columns ([[1,2,3,4,...],["a", "b", "c", "d",...]])
+        // values grouped by row ([[1,2,3,4,...],["a", "b", "c", "d",...]])
         public List<List<Object>> rows = new ArrayList<>();
 
         // summary row type (null, "sum", "product", ...)
