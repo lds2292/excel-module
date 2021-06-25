@@ -1,8 +1,8 @@
 package sfn.excel.module.workbook.read;
 
-import com.google.gson.Gson;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import sfn.excel.module.workbook.common.SfnEnums;
 import sfn.excel.module.workbook.read.models.SimpleWorkbookModels;
 
 import java.io.InputStream;
@@ -50,7 +50,7 @@ public class ExcelReadUtils {
 
             // response - sheet
             SimpleWorkbookModels.Worksheet responseSimpleWorksheet = new SimpleWorkbookModels.Worksheet(
-                    sheet.getSheetName(), sheetIdx, new ArrayList<>()
+                    sheet.getSheetName(), sheetIdx, new ArrayList<>(), new ArrayList<>()
             );
             responseSimpleWorkbook.worksheets.add(responseSimpleWorksheet);
 
@@ -65,32 +65,42 @@ public class ExcelReadUtils {
                 while (cellIterator.hasNext()) {
                     Cell cell = cellIterator.next();
                     String cellStringValue = "";
+                    SfnEnums.CellType cellType = SfnEnums.CellType.BLANK;
                     try {
                         switch (cell.getCellType()) {
                             case NUMERIC:
                                 // cellStringValue = String.valueOf(cell.getNumericCellValue());
                                 cellStringValue = dataFormatter.formatCellValue(cell);
+                                cellType = SfnEnums.CellType.NUMERIC;
                                 break;
                             case STRING:
                                 // cellStringValue = cell.getStringCellValue();
                                 cellStringValue = dataFormatter.formatCellValue(cell);
+                                cellType = SfnEnums.CellType.STRING;
                                 break;
                             case ERROR:
                                 cell.setCellType(CellType.STRING);
                                 cellStringValue = cell.getStringCellValue();
+                                cellType = SfnEnums.CellType.ERROR;
                                 break;
                             case BLANK:
                                 cellStringValue = "";
+                                cellType = SfnEnums.CellType.BLANK;
                                 break;
                             case FORMULA:
                                 cellStringValue = cell.getCellFormula();
+                                cellType = SfnEnums.CellType.FORMULA;
                             case BOOLEAN:
                                 cellStringValue = String.valueOf(cell.getBooleanCellValue());
+                                cellType = SfnEnums.CellType.BOOLEAN;
                             default:
                                 cellStringValue = dataFormatter.formatCellValue(cell);
+                                cellType = SfnEnums.CellType.DEFAULT;
                         }
                     } catch (Exception e) {
                         // e.printStackTrace();
+                        cellType = SfnEnums.CellType.CUSTOM_PARSE_ERROR;
+
                         try {
                             cell.setCellType(CellType.STRING);
                             cellStringValue = String.valueOf(cell.getStringCellValue());
@@ -104,6 +114,7 @@ public class ExcelReadUtils {
                         }
                     }
 
+                    if (cell.getRowIndex() == 1) responseSimpleWorksheet.columnDataTypes.add(cellType);
                     responseRow.add(cellStringValue);
                 }
 
