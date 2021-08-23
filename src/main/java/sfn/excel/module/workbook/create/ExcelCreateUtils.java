@@ -46,6 +46,8 @@ public class ExcelCreateUtils {
                     for (int j = 0; j < cells.size(); j++) {
                         XSSFCell xssfCell = xssfRow.createCell(j);
                         Object v = cells.get(j);
+                        if (v == null) continue;
+
                         if (v instanceof Boolean) {
                             xssfCell.setCellValue((Boolean) v);
                             xssfCell.setCellType(CellType.BOOLEAN);
