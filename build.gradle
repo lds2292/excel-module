@@ -44,7 +44,7 @@ publishing {
 publishing {
     repositories {
         maven {
-            String authEncoded = System.getenv('NEXUS_AUTH') ?: "d3JpdGVyOnNmbl8xMjM0IUAjJA=="
+            String authEncoded = System.getenv('NEXUS_AUTH')
             String userId = ''
             String pwd = ''
 
