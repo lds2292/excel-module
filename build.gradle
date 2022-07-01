@@ -48,8 +48,6 @@ publishing {
             String userId = ''
             String pwd = ''
 
-            println authEncoded
-
             if (authEncoded != null) {
                 String authDecoded = new String(authEncoded.decodeBase64())
                 userId = authDecoded.split(":")[0]
