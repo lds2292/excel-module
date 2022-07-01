@@ -1,7 +1,33 @@
 stages:
-  - test
+  - build
+  - publish
 
-test:
-  stage: test
+image: git.smartfoodnet.com:4567/devops/docker/gradle:7.4-jdk11
+
+.changes_conditions: &changes_conditions
+  changes:
+    - src/**/*
+    - .gradle
+    - .properties
+    - .gitlab-ci.yml
+
+build:
+  stage: build
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v\d+.\d+.\d+/ && $CI_PROJECT_NAMESPACE =~ /sfn-dev/sfn-common/'
+      <<: *changes_conditions
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != "main"'  # MR을 위해 push 한 경우만 빌드를 수행한다.
+      <<: *changes_conditions
   script:
-    - echo "empty test"
+    - echo $CI_PIPELINE_SOURCE
+    - gradle build
+
+publish:
+  stage: publish
+  dependencies:
+    - build
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v\d+.\d+.\d+/ && $CI_PROJECT_NAMESPACE =~ /sfn-dev/sfn-common/'
+      <<: *changes_conditions
+  script:
+    - gradle -Prelease.useLastTag=true final publish

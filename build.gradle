@@ -1,17 +1,15 @@
 plugins {
     id 'java-library'
+    id 'maven-publish'
 }
 
 group 'sfn'
-version '1.0.106'
+version '1.0.107'
 
 java.sourceCompatibility = JavaVersion.VERSION_11
+
 java {
     withSourcesJar()
-}
-
-repositories {
-    mavenCentral()
 }
 
 dependencies {
@@ -23,6 +21,49 @@ dependencies {
     // excel
     api group: "org.apache.poi", name: "poi", version: "4.1.0"
     api group: "org.apache.poi", name: "poi-ooxml", version: "4.1.0"
+}
+
+repositories {
+    maven {
+        url = "https://repo.smartfoodnet.com/repository/maven/"
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = group
+            artifactId = 'excel-module'
+            version = version
+
+            from components.java
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            String authEncoded = System.getenv('NEXUS_AUTH') ?: "d3JpdGVyOnNmbl8xMjM0IUAjJA=="
+            String userId = ''
+            String pwd = ''
+
+            println authEncoded
+
+            if (authEncoded != null) {
+                String authDecoded = new String(authEncoded.decodeBase64())
+                userId = authDecoded.split(":")[0]
+                pwd = authDecoded.split(":")[1]
+            }
+
+            url = 'https://repo.my.host/content/repositories/releases/'
+
+            credentials {
+                username = userId
+                password = pwd
+            }
+        }
+    }
 }
 
 jar {
