@@ -31,3 +31,4 @@ publish:
 #      <<: *changes_conditions
   script:
     - gradle -Prelease.useLastTag=true final publish
+  when: manual
