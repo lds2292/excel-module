@@ -55,7 +55,7 @@ publishing {
                 pwd = authDecoded.split(":")[1]
             }
 
-            url = 'https://repo.my.host/content/repositories/releases/'
+            url = 'https://repo.smartfoodnet.com/repository/maven-releases/'
 
             credentials {
                 username = userId
