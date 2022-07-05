@@ -7,7 +7,7 @@ image: git.smartfoodnet.com:4567/devops/docker/gradle:7.4-jdk11
 .changes_conditions: &changes_conditions
   changes:
     - src/**/*
-    - .gradle
+    - build.gradle
     - .properties
     - .gitlab-ci.yml
 
