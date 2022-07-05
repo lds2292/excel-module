@@ -28,9 +28,9 @@ publish:
   stage: publish
   dependencies:
     - build
-#  rules:
-#    - if: '$CI_COMMIT_TAG =~ /^v\d+.\d+.\d+/ && $CI_PROJECT_NAMESPACE =~ /sfn-dev\/sfn-common/'
-#      <<: *changes_conditions
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v\d+.\d+.\d+/ && $CI_PROJECT_NAMESPACE =~ /sfn-dev\/sfn-common/'
+      <<: *changes_conditions
   script:
     - gradle -Prelease.useLastTag=true publish
   when: manual
