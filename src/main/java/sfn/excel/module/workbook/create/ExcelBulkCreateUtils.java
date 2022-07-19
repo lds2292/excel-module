@@ -98,15 +98,14 @@ public class ExcelBulkCreateUtils {
             }
         });
 
-        // 임시파일생성
-        String fileName = "temporary_excel_" + System.currentTimeMillis();
-        String extension = ".xlsx";
 
-        FileOutputStream fos = new FileOutputStream(fileName + extension);
+        String fileFullPath = workbook.filePath + "/" + workbook.fileName;
+
+        FileOutputStream fos = new FileOutputStream(fileFullPath);
         sxssfWorkbook.write(fos);
         fos.close();
         sxssfWorkbook.dispose();
 
-        return fileName;
+        return fileFullPath;
     }
 }
