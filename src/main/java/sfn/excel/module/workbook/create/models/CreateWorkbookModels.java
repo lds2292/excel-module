@@ -7,6 +7,8 @@ public class CreateWorkbookModels {
 
     public static class Workbook {
         public List<Worksheet> worksheets = new ArrayList<>();
+        public String filePath;
+        public String fileName;
     }
 
     public static class Worksheet {
