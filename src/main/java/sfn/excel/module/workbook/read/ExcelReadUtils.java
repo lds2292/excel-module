@@ -1,14 +1,18 @@
 package sfn.excel.module.workbook.read;
 
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import sfn.excel.module.workbook.common.SfnEnums;
-import sfn.excel.module.workbook.read.models.SimpleWorkbookModels;
-
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import sfn.excel.module.workbook.common.SfnEnums;
+import sfn.excel.module.workbook.read.models.SimpleWorkbookModels;
 
 public class ExcelReadUtils {
     private static String returnStringValue(Cell cell) {
@@ -38,9 +42,9 @@ public class ExcelReadUtils {
         SimpleWorkbookModels.Workbook responseSimpleWorkbook =
                 new SimpleWorkbookModels.Workbook(workbookName, new ArrayList<>());
 
-        XSSFWorkbook wb = new XSSFWorkbook(inputStream);
+        Workbook wb = WorkbookFactory.create(inputStream);
+
         DataFormatter dataFormatter = new DataFormatter();
-//        XSSFDataFormat dataFormat = wb.getCreationHelper().form;
 
         int sheetIdx = 0;
         Iterator<Sheet> sheetIterator = wb.sheetIterator();
