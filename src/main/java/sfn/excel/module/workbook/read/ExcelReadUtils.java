@@ -65,11 +65,11 @@ public class ExcelReadUtils {
                 List<String> responseRow = new ArrayList<>();
 
                 Row row = rowIterator.next();
-                Iterator<Cell> cellIterator = row.cellIterator();
-                while (cellIterator.hasNext()) {
-                    Cell cell = cellIterator.next();
+
+                for (int i = 0; i < row.getLastCellNum(); i++) {
+                    Cell cell = row.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
                     String cellStringValue = "";
-                    SfnEnums.CellType cellType = SfnEnums.CellType.BLANK;
+                    SfnEnums.CellType cellType;
                     try {
                         switch (cell.getCellType()) {
                             case NUMERIC:
