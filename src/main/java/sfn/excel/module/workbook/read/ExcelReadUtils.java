@@ -78,7 +78,6 @@ public class ExcelReadUtils {
                                 cellType = SfnEnums.CellType.NUMERIC;
                                 break;
                             case STRING:
-                                // cellStringValue = cell.getStringCellValue();
                                 cellStringValue = dataFormatter.formatCellValue(cell);
                                 cellType = SfnEnums.CellType.STRING;
                                 break;
