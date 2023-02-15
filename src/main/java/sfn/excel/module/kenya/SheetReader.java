@@ -1,20 +1,20 @@
 package sfn.excel.module.kenya;
 
+import org.apache.poi.ss.usermodel.*;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.function.Consumer;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.ss.usermodel.DateUtil;
-import org.apache.poi.ss.usermodel.Sheet;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 
 public class SheetReader {
 
     private final Sheet sheet;
     private final DataFormatter dataFormatter = new DataFormatter();
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(
-        "yyyy-MM-dd HH:mm:ss");
+            "yyyy-MM-dd HH:mm:ss");
 
     public SheetReader(Sheet sheet) {
         if (isEmpty(sheet)) {
@@ -35,22 +35,46 @@ public class SheetReader {
         return sheet.getLastRowNum() == 0 && sheet.getRow(0) == null;
     }
 
-    public void repeatAllCell(int headerRowIndex, Consumer<String> action) {
+//    public void run(int startRow, Consumer<String> action) {
+//        int rowCount = this.sheet.getLastRowNum();
+//        int cellCount = this.sheet.getRow(startRow).getLastCellNum();
+//        for (int row = startRow + 1; row <= rowCount; row++) {
+//            for (int col = 0; col < cellCount; col++) {
+//                action.accept(this.value(row, col));
+//            }
+//        }
+//    }
+
+    public <R> List<R> run(int headerRow, Function<List<String>, R> apply) {
         int rowCount = this.sheet.getLastRowNum();
-        int cellCount = this.sheet.getRow(headerRowIndex).getLastCellNum();
-        for (int row = headerRowIndex + 1; row <= rowCount; row++) {
-            for (int col = 0; col < cellCount; col++) {
-                action.accept(this.value(row, col));
+        int cellCount = this.sheet.getRow(headerRow).getLastCellNum();
+        List<R> ret = new ArrayList<>();
+
+        for (int row = headerRow + 1; row <= rowCount; row++) {
+            List<String> cells = new ArrayList<>();
+            for (int col = 0; col < cellCount; col++){
+                cells.add(this.value(row, col));
             }
+            ret.add(apply.apply(cells));
         }
+
+        return ret;
     }
 
-    private String value(Cell cell) {
+    public String value(Cell cell) {
         return this.value(cell.getRowIndex(), cell.getColumnIndex());
     }
 
+    private Row row(int rownum) {
+        return this.sheet.getRow(rownum);
+    }
+
+    private Cell cell(int row, int colnum) {
+        return this.row(row).getCell(colnum);
+    }
+
     public String value(int row, int col) {
-        Cell cell = this.sheet.getRow(row).getCell(col);
+        Cell cell = this.cell(row, col);
         if (cell == null) {
             return "";
         }
@@ -60,9 +84,9 @@ public class SheetReader {
                 case NUMERIC:
                     if (DateUtil.isCellDateFormatted(cell)) {
                         LocalDateTime localdateTime = cell.getDateCellValue()
-                            .toInstant()
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalDateTime();
+                                .toInstant()
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDateTime();
                         return localdateTime.format(dateTimeFormatter);
                     } else {
                         return String.format("%f", cell.getNumericCellValue());
@@ -75,8 +99,8 @@ public class SheetReader {
                     return dataFormatter.formatCellValue(cell);
             }
         } catch (RuntimeException ex) {
-            System.out.println("SheetReader Error: "+row+"/"+col);
-           throw ex;
+            System.out.println("SheetReader Error: " + row + "/" + col);
+            throw ex;
         }
     }
 
@@ -85,9 +109,9 @@ public class SheetReader {
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
                     LocalDateTime localdateTime = cell.getDateCellValue()
-                        .toInstant()
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalDateTime();
+                            .toInstant()
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDateTime();
                     return localdateTime.format(dateTimeFormatter);
                 } else {
                     return String.format("%f", cell.getNumericCellValue());

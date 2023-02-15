@@ -1,23 +1,18 @@
 package sfn.excel.module.kenya;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.io.InputStream;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class ExcelReaderTest {
+import java.io.InputStream;
+import java.util.List;
 
-    @Test
-    void test(){
-        InputStream fileStream = this.getClass().getResourceAsStream("/ssg.xls");
-        Workbook workbook = new ExcelReader(fileStream).getWorkBook();
-        assertThat(workbook).isInstanceOf(HSSFWorkbook.class);
-    }
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+class ExcelReaderTest {
 
     @Test
     @DisplayName("xls파일을 열때는 HSSFWorkbook 클래스로 반환된다")
@@ -55,7 +50,7 @@ class ExcelReaderTest {
 
     @Test
     @DisplayName("시트열기")
-    void openSheet(){
+    void openSheet() {
         InputStream fileStream = this.getClass().getResourceAsStream("/ExcelTest.xlsx");
         ExcelReader excel = new ExcelReader(fileStream).init();
         assertThat(excel.sheet().getSheetName()).isEqualTo("시트 1");
@@ -64,18 +59,18 @@ class ExcelReaderTest {
 
     @Test
     @DisplayName("비어있는 엑셀 열었을경우")
-    void emptyExcel(){
+    void emptyExcel() {
         InputStream fileStream = this.getClass().getResourceAsStream("/ExcelBlank.xlsx");
-        assertThatThrownBy(()->{
+        assertThatThrownBy(() -> {
             new ExcelReader(fileStream).init().sheet();
         }).isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("Sheet Empty!");
+                .hasMessage("Sheet Empty!");
 
     }
 
     @Test
     @DisplayName("로우읽기")
-    void readRow(){
+    void readRow() {
         InputStream fileStream = this.getClass().getResourceAsStream("/ExcelTest.xlsx");
         ExcelReader excel = new ExcelReader(fileStream).init();
         assertThat(excel.sheet().value(1, 1)).isEqualTo("B");
@@ -83,7 +78,7 @@ class ExcelReaderTest {
 
     @Test
     @DisplayName("타입별 제대로 읽어오는지 확인")
-    void typeRead(){
+    void typeRead() {
         InputStream fileStream = this.getClass().getResourceAsStream("/typeExcel.xlsx");
         SheetReader sheet = new ExcelReader(fileStream).init().sheet();
         int rownum = 2;
@@ -92,12 +87,25 @@ class ExcelReaderTest {
         }
     }
 
+    // TODO : 테스트코드 확인
     @Test
     @DisplayName("모든셀 확인")
-    void typeReadRepeat(){
+    void typeReadRepeat() {
         InputStream fileStream = this.getClass().getResourceAsStream("/excel_test1624440489300.xlsx");
         SheetReader sheet = new ExcelReader(fileStream).init().sheet();
-        sheet.repeatAllCell(0, System.out::println);
+        List<TestDataModel> result = sheet.run(1, cells -> {
+            return new TestDataModel(
+                            cells.get(0),
+                            cells.get(3),
+                            cells.get(4),
+                            cells.get(7),
+                            cells.get(8),
+                            Integer.parseInt(cells.get(9))
+                    );
+                }
+        );
+
+        result.forEach(System.out::println);
     }
 
 }
