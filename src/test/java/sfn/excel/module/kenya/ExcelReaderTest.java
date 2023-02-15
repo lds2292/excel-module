@@ -13,6 +13,13 @@ import org.junit.jupiter.api.Test;
 class ExcelReaderTest {
 
     @Test
+    void test(){
+        InputStream fileStream = this.getClass().getResourceAsStream("/ssg.xls");
+        Workbook workbook = new ExcelReader(fileStream).getWorkBook();
+        assertThat(workbook).isInstanceOf(HSSFWorkbook.class);
+    }
+
+    @Test
     @DisplayName("xls파일을 열때는 HSSFWorkbook 클래스로 반환된다")
     void xlsFileOpenClassCheck() {
         InputStream fileStream = this.getClass().getResourceAsStream("/ExcelTest.xls");
