@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
@@ -17,7 +16,8 @@ public class ExcelReader {
     public static final int FIRST_COL = 0;
     public static final int FIRST_SHEET = 0;
 
-    private Workbook workBook;
+    private final Workbook workBook;
+    private List<SheetReader> sheetReaderList = new ArrayList<>();
 
     public ExcelReader(File file) throws FailedReadFileException {
         assert file != null;
@@ -57,18 +57,26 @@ public class ExcelReader {
         }
     }
 
+    public ExcelReader init() {
+        for (int i = 0; i < this.workBook.getNumberOfSheets(); i++) {
+            this.sheetReaderList.add(new SheetReader(this.workBook.getSheetAt(i)));
+        }
+        return this;
+    }
+
     public Workbook getWorkBook() {
         return workBook;
     }
 
-    public Sheet sheet(){
-        return this.workBook.getSheetAt(FIRST_SHEET);
+    public SheetReader sheet(){
+        return this.sheetReaderList.get(FIRST_SHEET);
     }
-    public Sheet sheet(int index) {
-        return this.workBook.getSheetAt(index);
+    public SheetReader sheet(int index) {
+        return this.sheetReaderList.get(index);
     }
 
-    public Sheet sheet(String sheetName) {
-        return this.workBook.getSheet(sheetName);
+    public SheetReader sheet(String sheetName) {
+        int sheetIndex = this.workBook.getSheetIndex(sheetName);
+        return this.sheetReaderList.get(sheetIndex);
     }
 }
