@@ -77,6 +77,7 @@ public class ExcelReader {
 
     public SheetReader sheet(String sheetName) {
         int sheetIndex = this.workBook.getSheetIndex(sheetName);
+        if (sheetIndex == -1 ) throw new NotFoundSheetException(sheetName);
         return this.sheetReaderList.get(sheetIndex);
     }
 }

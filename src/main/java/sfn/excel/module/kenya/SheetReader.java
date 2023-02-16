@@ -1,5 +1,6 @@
 package sfn.excel.module.kenya;
 
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -41,13 +42,38 @@ public class SheetReader {
         return sheet.getLastRowNum() == 0 && sheet.getRow(0) == null;
     }
 
+    public <T> List<T> run(Class<T> clazz)
+        throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+        T instance = ClassSupport.createInstance(clazz);
+        return List.of(instance);
+    }
+
+    /**
+     * Functional에 구현한 함수를 실행하고 결과값을 {@code List<R>}로 반환합니다.
+     * <p>
+     * 엑셀의 시작은 두번째 줄부터 시작하며, 첫줄은 Header(=title)로 인식합니다.
+     * <p>
+     * {@code Functional<Cells, R>}중 Cells는 Row에 있는 모든 Cell의 정보가 있습니다. 이 Cell의 정보를 사용하여 Cell의 값을 가져올 수 있습니다.
+     * @param apply 실행할 함수
+     * @param <R> 반환할 타입
+     * @return {@code List<R>} Funtional 함수의 반환값
+     */
     public <R> List<R> run(Function<Cells, R> apply) {
         return this.run(0, apply);
     }
 
+    /**
+     * Functional에 구현한 함수를 실행하고 결과값을 {@code List<R>}로 반환합니다.
+     * <p>
+     * 엑셀의 시작은 headerRow+1부터 시작하며, headerRow는 Header(=title)로 인식합니다.
+     * <p>
+     * {@code Functional<Cells, R>}중 Cells는 Row에 있는 모든 Cell의 정보가 있습니다. 이 Cell의 정보를 사용하여 Cell의 값을 가져올 수 있습니다.
+     * @param headerRow header(=title)이 있는 Row 번호 첫줄의 Row Index는 0입니다.
+     * @param apply 실행할 함수
+     * @param <R> 반환할 타입
+     * @return {@code List<R>} Funtional 함수의 반환값
+     */
     public <R> List<R> run(int headerRow, Function<Cells, R> apply) {
-        int rowCount = this.sheet.getLastRowNum();
-        int cellCount = this.sheet.getRow(headerRow).getLastCellNum();
         List<R> ret = new ArrayList<>();
 
         List<String> columnNames = new ArrayList<>();
@@ -56,6 +82,8 @@ public class SheetReader {
             columnNames.add(this.value(headerRow, headerCol));
         }
 
+        int rowCount = this.sheet.getLastRowNum();
+        int cellCount = this.sheet.getRow(headerRow).getLastCellNum();
         for (int row = headerRow + 1; row <= rowCount; row++) {
             List<CellValue> columnList = new ArrayList<>();
             for (int col = 0; col < cellCount; col++){
@@ -107,7 +135,7 @@ public class SheetReader {
             }
         } catch (RuntimeException ex) {
             System.out.println("SheetReader Error: " + row + "/" + col);
-            throw ex;
+            throw new FailedGetCellValueException(row, col, ex);
         }
     }
 
