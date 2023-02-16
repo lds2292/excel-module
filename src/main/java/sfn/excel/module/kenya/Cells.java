@@ -20,8 +20,13 @@ public class Cells {
      * @param columnName 가져올 컬럼명
      * @return CellValue
      */
+
+    int findColumnNameIndex(String columnName) {
+        return this.columnNames.indexOf(columnName);
+    }
+
     CellValue get(String columnName) {
-        int index = this.columnNames.indexOf(columnName);
+        int index = findColumnNameIndex(columnName);
         if (index == -1) return new CellValue();
         return cellValues.get(index);
     }
@@ -46,6 +51,10 @@ public class Cells {
      */
     String getString(String columnName) {
         return this.get(columnName).toString();
+    }
+
+    String getString(int index) {
+        return this.get(index).toString();
     }
 
     public List<String> getColumnNames() {

@@ -16,8 +16,7 @@ public class TestDataModel {
     @StringColumn(headerName = "바코드", defaultValue = "기본바코드")
     private String barcode;
 
-    @IntegerColumn(headerName = "바코드", defaultValue = 0)
-    @Deprecated
+    @IntegerColumn(headerName = "박스스스", defaultValue = 0)
     private Integer box;
 
     private TestDataModel() {

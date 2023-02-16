@@ -1,6 +1,5 @@
 package sfn.excel.module.kenya;
 
-import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -42,10 +41,26 @@ public class SheetReader {
         return sheet.getLastRowNum() == 0 && sheet.getRow(0) == null;
     }
 
-    public <T> List<T> run(Class<T> clazz)
-        throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException {
-        T instance = ClassSupport.createInstance(clazz);
-        return List.of(instance);
+    public <T> List<T> run(Class<T> clazz) {
+        return this.run(0, clazz);
+    }
+
+    public <T> List<T> run(int headerRow, Class<T> clazz) {
+        List<String> columnNames = readColumnHeaders(headerRow);
+
+        List<T> ret = new ArrayList<>();
+        int rowCount = this.sheet.getLastRowNum();
+        int cellCount = this.sheet.getRow(headerRow).getLastCellNum();
+        for (int row = headerRow + 1; row <= rowCount; row++) {
+            List<CellValue> columnList = new ArrayList<>();
+            for (int col = 0; col < cellCount; col++){
+                columnList.add(new CellValue(this.value(row, col)));
+            }
+            Cells cells = new Cells(columnNames, columnList);
+            ret.add(ClassSupport.createInstance(cells, clazz));
+        }
+
+        return ret;
     }
 
     /**
@@ -70,18 +85,13 @@ public class SheetReader {
      * {@code Functional<Cells, R>}중 Cells는 Row에 있는 모든 Cell의 정보가 있습니다. 이 Cell의 정보를 사용하여 Cell의 값을 가져올 수 있습니다.
      * @param headerRow header(=title)이 있는 Row 번호 첫줄의 Row Index는 0입니다.
      * @param apply 실행할 함수
-     * @param <R> 반환할 타입
+     * @param <T> 반환할 타입
      * @return {@code List<R>} Funtional 함수의 반환값
      */
-    public <R> List<R> run(int headerRow, Function<Cells, R> apply) {
-        List<R> ret = new ArrayList<>();
+    public <T> List<T> run(int headerRow, Function<Cells, T> apply) {
+        List<String> columnNames = readColumnHeaders(headerRow);
 
-        List<String> columnNames = new ArrayList<>();
-        Row headers = this.sheet.getRow(headerRow);
-        for (int headerCol = 0; headerCol < headers.getLastCellNum(); headerCol++) {
-            columnNames.add(this.value(headerRow, headerCol));
-        }
-
+        List<T> ret = new ArrayList<>();
         int rowCount = this.sheet.getLastRowNum();
         int cellCount = this.sheet.getRow(headerRow).getLastCellNum();
         for (int row = headerRow + 1; row <= rowCount; row++) {
@@ -94,6 +104,15 @@ public class SheetReader {
         }
 
         return ret;
+    }
+
+    private List<String> readColumnHeaders(int headerRow){
+        List<String> columnNames = new ArrayList<>();
+        Row headers = this.sheet.getRow(headerRow);
+        for (int headerCol = 0; headerCol < headers.getLastCellNum(); headerCol++) {
+            columnNames.add(this.value(headerRow, headerCol));
+        }
+        return columnNames;
     }
 
     public String value(Cell cell) {

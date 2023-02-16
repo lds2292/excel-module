@@ -6,7 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 우선순위는 index -> name 순으로 시작된다. 아무것도 입력되지 않았을경우 index는 필수 입력해야한다
+ * 우선순위는 index -> name 순으로 시작된다
+ * <p>
+ * HeaderName을 찾지 못한다면 에러가 발생한다.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
@@ -14,4 +16,6 @@ public @interface StringColumn {
     int headerIndex() default -1;
     String headerName() default "";
     String defaultValue();
+
+    NotFoundHeaderNamePolicy policy() default NotFoundHeaderNamePolicy.DEFAULT_VALUE;
 }
