@@ -14,15 +14,15 @@ java {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testImplementation 'org.assertj:assertj-core:3.21.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 
-    // gson
-    api group: "com.google.code.gson", name: "gson", version: "2.7"
     // excel
     api group: "org.apache.poi", name: "poi", version: "4.1.0"
     api group: "org.apache.poi", name: "poi-ooxml", version: "4.1.0"
 }
+
 
 repositories {
     maven {
