@@ -16,14 +16,14 @@ public class SheetReader {
 
     private final Sheet sheet;
     private final DataFormatter dataFormatter = new DataFormatter();
-    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(
-            "yyyy-MM-dd HH:mm:ss");
+    private final DateTimeFormatter defaultDateTimeFormatter;
 
-    public SheetReader(Sheet sheet) {
+    public SheetReader(Sheet sheet, DateTimeFormatter defaultDateTimeFormatter) {
         if (isEmpty(sheet)) {
             throw new IllegalArgumentException("Sheet Empty!");
         }
         this.sheet = sheet;
+        this.defaultDateTimeFormatter = defaultDateTimeFormatter;
     }
 
     public int lastCellNum(int rownum) {
@@ -141,7 +141,7 @@ public class SheetReader {
                                 .toInstant()
                                 .atZone(ZoneId.systemDefault())
                                 .toLocalDateTime();
-                        return localdateTime.format(dateTimeFormatter);
+                        return localdateTime.format(defaultDateTimeFormatter);
                     } else {
                         return String.format("%f", cell.getNumericCellValue());
                     }
@@ -166,7 +166,7 @@ public class SheetReader {
                             .toInstant()
                             .atZone(ZoneId.systemDefault())
                             .toLocalDateTime();
-                    return localdateTime.format(dateTimeFormatter);
+                    return localdateTime.format(defaultDateTimeFormatter);
                 } else {
                     return String.format("%f", cell.getNumericCellValue());
                 }

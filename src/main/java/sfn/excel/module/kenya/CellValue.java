@@ -80,7 +80,10 @@ public class CellValue {
      */
     public LocalDateTime toLocalDateTime(LocalDateTime defaultValue, DateTimeFormatter formatter) {
         if (Objects.isNull(this.value)) return defaultValue;
-        return LocalDateTime.parse(this.value, formatter);
+
+        String replaceValue = DateTypeNormalizer.edit(this.value);
+
+        return LocalDateTime.parse(replaceValue, formatter);
     }
 
     @Override

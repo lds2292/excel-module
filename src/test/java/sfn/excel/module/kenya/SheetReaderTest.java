@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -62,7 +61,8 @@ class SheetReaderTest {
                         cells.get(4).toString(),
                         cells.get(7).toString(),
                         cells.get(8).toString(),
-                                cells.get(9).toInt()
+                                cells.get(9).toInt(),
+            cells.get("유통기한").toLocalDateTime(null)
             )
         );
 
@@ -71,13 +71,12 @@ class SheetReaderTest {
 
     @Test
     @DisplayName("리플렉션 확인")
-    void reflectionCheck()
-        throws NoSuchMethodException, NoSuchFieldException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    void reflectionCheck() {
         InputStream fileStream = this.getClass().getResourceAsStream("/Test13Rows.xlsx");
         SheetReader sheet = new ExcelReader(fileStream).init().sheet();
 
         List<TestDataModel> result = sheet.run(TestDataModel.class);
-        System.out.println(result);
+        result.forEach(System.out::println);
     }
 
 }
