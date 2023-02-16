@@ -6,9 +6,9 @@ public class TestDataModel {
     private final String temperature;
     private final String productName;
     private final String barcode;
-    private final int box;
+    private final Integer box;
 
-    public TestDataModel(String kind, String locationName, String temperature, String productName, String barcode, int box) {
+    public TestDataModel(String kind, String locationName, String temperature, String productName, String barcode, Integer box) {
         this.kind = kind;
         this.locationName = locationName;
         this.temperature = temperature;
@@ -37,7 +37,7 @@ public class TestDataModel {
         return barcode;
     }
 
-    public int getBox() {
+    public Integer getBox() {
         return box;
     }
 

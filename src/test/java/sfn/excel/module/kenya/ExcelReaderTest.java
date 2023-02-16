@@ -1,16 +1,15 @@
 package sfn.excel.module.kenya;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.io.InputStream;
+import java.util.List;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.io.InputStream;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ExcelReaderTest {
 
@@ -87,22 +86,20 @@ class ExcelReaderTest {
         }
     }
 
-    // TODO : 테스트코드 확인
     @Test
     @DisplayName("모든셀 확인")
     void typeReadRepeat() {
         InputStream fileStream = this.getClass().getResourceAsStream("/excel_test1624440489300.xlsx");
         SheetReader sheet = new ExcelReader(fileStream).init().sheet();
-        List<TestDataModel> result = sheet.run(1, cells -> {
-            return new TestDataModel(
-                            cells.get(0),
-                            cells.get(3),
-                            cells.get(4),
-                            cells.get(7),
-                            cells.get(8),
-                            Integer.parseInt(cells.get(9))
-                    );
-                }
+
+        List<TestDataModel> result = sheet.run(cells -> new TestDataModel(
+                        cells.getString("구분"),
+                        cells.getString("그룹"),
+                        cells.get(4).toString(),
+                        cells.get(7).toString(),
+                        cells.get(8).toString(),
+                                cells.get(9).toInt()
+            )
         );
 
         result.forEach(System.out::println);

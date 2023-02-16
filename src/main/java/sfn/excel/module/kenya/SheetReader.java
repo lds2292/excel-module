@@ -1,13 +1,16 @@
 package sfn.excel.module.kenya;
 
-import org.apache.poi.ss.usermodel.*;
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 
 public class SheetReader {
 
@@ -26,6 +29,9 @@ public class SheetReader {
     public int lastCellNum(int rownum) {
         return this.sheet.getRow(rownum).getLastCellNum();
     }
+    public int lastRowNum() {
+        return this.sheet.getLastRowNum();
+    }
 
     public String getSheetName() {
         return this.sheet.getSheetName();
@@ -35,26 +41,27 @@ public class SheetReader {
         return sheet.getLastRowNum() == 0 && sheet.getRow(0) == null;
     }
 
-//    public void run(int startRow, Consumer<String> action) {
-//        int rowCount = this.sheet.getLastRowNum();
-//        int cellCount = this.sheet.getRow(startRow).getLastCellNum();
-//        for (int row = startRow + 1; row <= rowCount; row++) {
-//            for (int col = 0; col < cellCount; col++) {
-//                action.accept(this.value(row, col));
-//            }
-//        }
-//    }
+    public <R> List<R> run(Function<Cells, R> apply) {
+        return this.run(0, apply);
+    }
 
-    public <R> List<R> run(int headerRow, Function<List<String>, R> apply) {
+    public <R> List<R> run(int headerRow, Function<Cells, R> apply) {
         int rowCount = this.sheet.getLastRowNum();
         int cellCount = this.sheet.getRow(headerRow).getLastCellNum();
         List<R> ret = new ArrayList<>();
 
+        List<String> columnNames = new ArrayList<>();
+        Row headers = this.sheet.getRow(headerRow);
+        for (int headerCol = 0; headerCol < headers.getLastCellNum(); headerCol++) {
+            columnNames.add(this.value(headerRow, headerCol));
+        }
+
         for (int row = headerRow + 1; row <= rowCount; row++) {
-            List<String> cells = new ArrayList<>();
+            List<CellValue> columnList = new ArrayList<>();
             for (int col = 0; col < cellCount; col++){
-                cells.add(this.value(row, col));
+                columnList.add(new CellValue(this.value(row, col)));
             }
+            Cells cells = new Cells(columnNames, columnList);
             ret.add(apply.apply(cells));
         }
 
