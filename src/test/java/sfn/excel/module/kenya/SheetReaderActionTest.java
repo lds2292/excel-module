@@ -1,0 +1,50 @@
+package sfn.excel.module.kenya;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.InputStream;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+public class SheetReaderActionTest {
+    @Test
+    @DisplayName("모든셀 확인")
+    void typeReadRepeat() {
+        InputStream fileStream = this.getClass().getResourceAsStream("/Test13Rows.xlsx");
+        SheetReader sheet = new ExcelReader(fileStream).init().sheet();
+
+        List<TestDataModel> result = sheet.cellMap(cells -> new TestDataModel(
+                cells.getString("구분"),
+                cells.getString("그룹"),
+                cells.get(4).toString(),
+                cells.get(7).toString(),
+                cells.get(8).toString(),
+                cells.get(9).toInt(),
+                cells.get("유통기한").toLocalDate()
+            )
+        );
+
+        result.forEach(System.out::println);
+    }
+
+    @Test
+    @DisplayName("특정셀 체크")
+    void readTest(){
+        InputStream fileStream = this.getClass().getResourceAsStream("/Test13Rows.xlsx");
+        SheetReader sheet = new ExcelReader(fileStream).init().sheet();
+
+        List<String> kinds = sheet.cellMap(cells -> cells.get("구분").toString());
+        assertThat(kinds.size()).isEqualTo(12);
+    }
+
+    @Test
+    @DisplayName("리플렉션 확인")
+    void reflectionCheck() {
+        InputStream fileStream = this.getClass().getResourceAsStream("/Test13Rows.xlsx");
+        SheetReader sheet = new ExcelReader(fileStream).init().sheet();
+
+        List<TestDataModel> result = sheet.cellMap(TestDataModel.class);
+        result.forEach(System.out::println);
+    }
+}

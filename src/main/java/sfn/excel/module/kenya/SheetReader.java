@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -42,16 +43,16 @@ public class SheetReader {
         return sheet.getLastRowNum() == 0 && sheet.getRow(0) == null;
     }
 
-    public <T> List<T> action(Class<T> clazz) {
-        return this.action(0, clazz);
+    public <T> List<T> cellMap(Class<T> clazz) {
+        return this.cellMap(0, clazz);
     }
 
-    public <T> List<T> action(int headerRow, Class<T> clazz) {
+    public <T> List<T> cellMap(int headerRow, Class<T> clazz) {
         List<String> columnNames = readColumnHeaders(headerRow);
 
         List<T> ret = new ArrayList<>();
         int rowCount = this.sheet.getLastRowNum();
-        int cellCount = this.sheet.getRow(headerRow).getLastCellNum();
+        int cellCount = columnNames.size();
         for (int row = headerRow + 1; row <= rowCount; row++) {
             List<CellValue> columnList = new ArrayList<>();
             for (int col = 0; col < cellCount; col++) {
@@ -76,8 +77,8 @@ public class SheetReader {
      * @param <R>   반환할 타입
      * @return {@code List<R>} Funtional 함수의 반환값
      */
-    public <R> List<R> action(Function<Cells, R> apply) {
-        return this.action(0, apply);
+    public <R> List<R> cellMap(Function<Cells, R> apply) {
+        return this.cellMap(0, apply);
     }
 
     /**
@@ -93,12 +94,12 @@ public class SheetReader {
      * @param <T>       반환할 타입
      * @return {@code List<R>} Funtional 함수의 반환값
      */
-    public <T> List<T> action(int headerRow, Function<Cells, T> apply) {
+    public <T> List<T> cellMap(int headerRow, Function<Cells, T> apply) {
         List<String> columnNames = readColumnHeaders(headerRow);
 
         List<T> ret = new ArrayList<>();
         int rowCount = this.sheet.getLastRowNum();
-        int cellCount = this.sheet.getRow(headerRow).getLastCellNum();
+        int cellCount = columnNames.size();
         for (int row = headerRow + 1; row <= rowCount; row++) {
             List<CellValue> columnList = new ArrayList<>();
             for (int col = 0; col < cellCount; col++) {
@@ -109,6 +110,25 @@ public class SheetReader {
         }
 
         return ret;
+    }
+
+    public void cellForEach(Consumer<Cells> consumer){
+        cellForEach(0, consumer);
+    }
+
+    public void cellForEach(int headerRow, Consumer<Cells> consumer){
+        List<String> columnNames = readColumnHeaders(headerRow);
+
+        int rowCount = this.sheet.getLastRowNum();
+        int cellCount = columnNames.size();
+        for (int row = headerRow + 1; row <= rowCount; row++) {
+            List<CellValue> columnList = new ArrayList<>();
+            for (int col = 0; col < cellCount; col++) {
+                columnList.add(this.cell(row, col));
+            }
+            Cells cells = new Cells(columnNames, columnList);
+            consumer.accept(cells);
+        }
     }
 
     private List<String> readColumnHeaders(int headerRow) {
@@ -124,12 +144,26 @@ public class SheetReader {
         return this.value(cell.getRowIndex(), cell.getColumnIndex());
     }
 
-    private Row row(int row) {
+    private Row rowFromSheet(int row) {
         return this.sheet.getRow(row);
     }
 
+    public List<CellValue> row(int row) {
+        return row(0, row);
+    }
+
+    public List<CellValue> row(int headerRow, int row) {
+        int columnCount = readColumnHeaders(headerRow).size();
+        List<CellValue> cells = new ArrayList<>();
+        for (int col = 0; col < columnCount; col++) {
+            cells.add(this.cell(row, col));
+        }
+
+        return cells;
+    }
+
     private Cell cellFromRowCol(int row, int col) {
-        return this.row(row).getCell(col);
+        return this.rowFromSheet(row).getCell(col);
     }
 
     public CellValue cell(int row, int col) {
@@ -189,6 +223,5 @@ public class SheetReader {
                 return dataFormatter.formatCellValue(cell);
         }
     }
-
 }
 
