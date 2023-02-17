@@ -11,9 +11,9 @@ import sfn.excel.module.kenya.NotFoundHeaderNamePolicy;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
-public @interface IntegerColumn {
+public @interface NumericColumn {
     int headerIndex() default -1;
     String headerName();
-    int defaultValue() default 0;
+    double defaultValue() default 0.0;
     NotFoundHeaderNamePolicy policy() default NotFoundHeaderNamePolicy.ERROR;
 }

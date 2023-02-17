@@ -1,19 +1,33 @@
 package sfn.excel.module.kenya;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Objects;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 
 public class CellValue {
 
     private String value = "";
+    private String format;
+    private CellType type;
+
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public CellValue() {}
+
+    public CellValue(Cell cell, String value){
+        this.value = value;
+        this.format = cell == null ? null : cell.getCellStyle().getDataFormatString();
+        this.type = cell == null ? null : cell.getCellType();
+    }
 
     public CellValue(String value) {
         this.value = value;
     }
+
     /**
      * Cell에 있는 값을 Integer로 변환합니다. Cell value가 null, 빈값 또는 변환할 수 없을때는 null을 반환합니다
      * </p>
@@ -61,14 +75,20 @@ public class CellValue {
         return Double.parseDouble(value);
     }
 
-    /**
-     * 특정 포매터를 사용하여 문자열을 local date-time으로 반환합니다
-     * @param defaultValue null일 경우 반환할 기본값 입니다
-     * @return local date-time으로 반환하고 null이 반환될수 있습니다
-     * @throws DateTimeParseException 문자열을 파싱할 수 없을때 Exception
-     */
-    public LocalDateTime toLocalDateTime(LocalDateTime defaultValue) {
-        return this.toLocalDateTime(defaultValue, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    public LocalDate toLocalDate(){
+        return this.toLocalDateTime().toLocalDate();
+    }
+
+    public LocalDate toLocalDate(LocalDateTime defaultValue) {
+        return this.toLocalDateTime(defaultValue).toLocalDate();
+    }
+
+    public LocalDate toLocalDate(LocalDateTime defaultValue, DateTimeFormatter formatter) {
+        return this.toLocalDateTime(defaultValue, formatter).toLocalDate();
+    }
+
+    public LocalDateTime toLocalDateTime(){
+       return this.toLocalDateTime(null, formatter);
     }
 
     /**
@@ -80,10 +100,26 @@ public class CellValue {
      */
     public LocalDateTime toLocalDateTime(LocalDateTime defaultValue, DateTimeFormatter formatter) {
         if (Objects.isNull(this.value)) return defaultValue;
+        if (this.value.isBlank()) return defaultValue;
 
-        String replaceValue = DateTypeNormalizer.edit(this.value);
+        try {
+            String replaceValue = DateTypeNormalizer.edit(this.value);
 
-        return LocalDateTime.parse(replaceValue, formatter);
+            return LocalDateTime.parse(replaceValue, formatter);
+        } catch (DateTimeParseException ex) {
+            String message = "데이터 변환중 오류가 발생했습니다 (value: %s, type: %s, format: %s)";
+            throw new FailedParseException(String.format(message, value, type, format), ex);
+        }
+    }
+
+    /**
+     * 특정 포매터를 사용하여 문자열을 local date-time으로 반환합니다
+     * @param defaultValue null일 경우 반환할 기본값 입니다
+     * @return local date-time으로 반환하고 null이 반환될수 있습니다
+     * @throws DateTimeParseException 문자열을 파싱할 수 없을때 Exception
+     */
+    public LocalDateTime toLocalDateTime(LocalDateTime defaultValue) {
+        return this.toLocalDateTime(defaultValue, formatter);
     }
 
     @Override
