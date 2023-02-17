@@ -40,7 +40,7 @@ public class SheetReader {
     }
 
     private static boolean isEmpty(Sheet sheet) {
-        return sheet.getLastRowNum() == 0 && sheet.getRow(0) == null;
+        return sheet.getLastRowNum() == -1 && sheet.getRow(0) == null;
     }
 
     public <T> List<T> cellMap(Class<T> clazz) {
