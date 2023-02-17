@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,19 +52,57 @@ class SheetReaderTest {
     }
 
     @Test
+    @DisplayName("CellValue로 제대로 읽어오는지 확인")
+    void typeReadFromCellValue() {
+        InputStream fileStream = this.getClass().getResourceAsStream("/typeExcel.xlsx");
+        SheetReader sheet = new ExcelReader(fileStream).init().sheet();
+        assertThat(sheet.cell(0, 0).toString()).isEqualTo("헤더1");
+        assertThat(sheet.cell(1, 0).toString()).isEqualTo("2023-01-01 00:00:00");
+        assertThat(sheet.cell(1, 1).toDouble()).isEqualTo(44927.0d);
+    }
+
+    @Test
+    @DisplayName("Date 관련 타입을 제대로 읽어오는지 확인")
+    void dateTypeReadTest(){
+        InputStream fileStream = this.getClass().getResourceAsStream("/DateExcel.xlsx");
+        SheetReader sheet = new ExcelReader(fileStream).init().sheet();
+
+        LocalDateTime expectLocalDate = LocalDate.of(2023, 1, 1).atStartOfDay();
+        LocalDateTime expectLocalDateTime = LocalDateTime.of(2023, 1, 1,1,1,1);
+
+        assertThat(sheet.cell(0, 1).toString()).isEqualTo("2023-01-01");
+        assertThat(sheet.cell(0, 1).toLocalDateTime()).isEqualTo(expectLocalDate);
+        assertThat(sheet.cell(0, 2).toString()).isEqualTo("2023/01/01");
+        assertThat(sheet.cell(0, 2).toLocalDateTime()).isEqualTo(expectLocalDate);
+        assertThat(sheet.cell(0, 3).toString()).isEqualTo("2023.01.01");
+        assertThat(sheet.cell(0, 3).toLocalDateTime()).isEqualTo(expectLocalDate);
+        assertThat(sheet.cell(0, 4).toString()).isEqualTo("20230101");
+        assertThat(sheet.cell(0, 4).toLocalDateTime()).isEqualTo(expectLocalDate);
+
+        assertThat(sheet.cell(1, 1).toString()).isEqualTo("2023-01-01 01:01:01");
+        assertThat(sheet.cell(1, 1).toLocalDateTime()).isEqualTo(expectLocalDateTime);
+        assertThat(sheet.cell(1, 2).toString()).isEqualTo("2023/01/01 01:01:01");
+        assertThat(sheet.cell(1, 2).toLocalDateTime()).isEqualTo(expectLocalDateTime);
+        assertThat(sheet.cell(1, 3).toString()).isEqualTo("2023.01.01 01:01:01");
+        assertThat(sheet.cell(1, 3).toLocalDateTime()).isEqualTo(expectLocalDateTime);
+        assertThat(sheet.cell(1, 4).toString()).isEqualTo("20230101010101");
+        assertThat(sheet.cell(1, 4).toLocalDateTime()).isEqualTo(expectLocalDateTime);
+    }
+
+    @Test
     @DisplayName("모든셀 확인")
     void typeReadRepeat() {
         InputStream fileStream = this.getClass().getResourceAsStream("/Test13Rows.xlsx");
         SheetReader sheet = new ExcelReader(fileStream).init().sheet();
 
-        List<TestDataModel> result = sheet.run(cells -> new TestDataModel(
+        List<TestDataModel> result = sheet.action(cells -> new TestDataModel(
                         cells.getString("구분"),
                         cells.getString("그룹"),
                         cells.get(4).toString(),
                         cells.get(7).toString(),
                         cells.get(8).toString(),
                                 cells.get(9).toInt(),
-            cells.get("유통기한").toLocalDateTime(null)
+            cells.get("유통기한").toLocalDate()
             )
         );
 
@@ -75,7 +115,7 @@ class SheetReaderTest {
         InputStream fileStream = this.getClass().getResourceAsStream("/Test13Rows.xlsx");
         SheetReader sheet = new ExcelReader(fileStream).init().sheet();
 
-        List<TestDataModel> result = sheet.run(TestDataModel.class);
+        List<TestDataModel> result = sheet.action(TestDataModel.class);
         result.forEach(System.out::println);
     }
 

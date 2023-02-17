@@ -1,8 +1,7 @@
 package sfn.excel.module.kenya;
 
-import java.time.LocalDateTime;
-import sfn.excel.module.kenya.annotation.IntegerColumn;
-import sfn.excel.module.kenya.annotation.LocalDateTimeColumn;
+import java.time.LocalDate;
+import sfn.excel.module.kenya.annotation.NumericColumn;
 import sfn.excel.module.kenya.annotation.StringColumn;
 
 public class TestDataModel {
@@ -21,17 +20,17 @@ public class TestDataModel {
     @StringColumn(headerName = "바코드", defaultValue = "기본바코드")
     private String barcode;
 
-    @IntegerColumn(headerName = "박스입수")
+    @NumericColumn(headerName = "박스입수")
     private Integer box;
 
-    @LocalDateTimeColumn(headerName = "유통기한")
-    private LocalDateTime expireDate;
+    @StringColumn(headerName = "유통기한")
+    private LocalDate expireDate;
 
     private TestDataModel() {
     }
 
     public TestDataModel(String kind, String locationName, String temperature, String productName,
-        String barcode, Integer box, LocalDateTime expireDate) {
+        String barcode, Integer box, LocalDate expireDate) {
         this.kind = kind;
         this.locationName = locationName;
         this.temperature = temperature;
@@ -65,7 +64,7 @@ public class TestDataModel {
         return box;
     }
 
-    public LocalDateTime getExpireDate() {
+    public LocalDate getExpireDate() {
         return expireDate;
     }
 
