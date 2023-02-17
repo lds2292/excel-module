@@ -42,11 +42,11 @@ public class SheetReader {
         return sheet.getLastRowNum() == 0 && sheet.getRow(0) == null;
     }
 
-    public <T> List<T> run(Class<T> clazz) {
-        return this.run(0, clazz);
+    public <T> List<T> action(Class<T> clazz) {
+        return this.action(0, clazz);
     }
 
-    public <T> List<T> run(int headerRow, Class<T> clazz) {
+    public <T> List<T> action(int headerRow, Class<T> clazz) {
         List<String> columnNames = readColumnHeaders(headerRow);
 
         List<T> ret = new ArrayList<>();
@@ -76,8 +76,8 @@ public class SheetReader {
      * @param <R>   반환할 타입
      * @return {@code List<R>} Funtional 함수의 반환값
      */
-    public <R> List<R> run(Function<Cells, R> apply) {
-        return this.run(0, apply);
+    public <R> List<R> action(Function<Cells, R> apply) {
+        return this.action(0, apply);
     }
 
     /**
@@ -93,7 +93,7 @@ public class SheetReader {
      * @param <T>       반환할 타입
      * @return {@code List<R>} Funtional 함수의 반환값
      */
-    public <T> List<T> run(int headerRow, Function<Cells, T> apply) {
+    public <T> List<T> action(int headerRow, Function<Cells, T> apply) {
         List<String> columnNames = readColumnHeaders(headerRow);
 
         List<T> ret = new ArrayList<>();

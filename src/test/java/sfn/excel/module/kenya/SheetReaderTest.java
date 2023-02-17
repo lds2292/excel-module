@@ -95,7 +95,7 @@ class SheetReaderTest {
         InputStream fileStream = this.getClass().getResourceAsStream("/Test13Rows.xlsx");
         SheetReader sheet = new ExcelReader(fileStream).init().sheet();
 
-        List<TestDataModel> result = sheet.run(cells -> new TestDataModel(
+        List<TestDataModel> result = sheet.action(cells -> new TestDataModel(
                         cells.getString("구분"),
                         cells.getString("그룹"),
                         cells.get(4).toString(),
@@ -115,7 +115,7 @@ class SheetReaderTest {
         InputStream fileStream = this.getClass().getResourceAsStream("/Test13Rows.xlsx");
         SheetReader sheet = new ExcelReader(fileStream).init().sheet();
 
-        List<TestDataModel> result = sheet.run(TestDataModel.class);
+        List<TestDataModel> result = sheet.action(TestDataModel.class);
         result.forEach(System.out::println);
     }
 

@@ -61,14 +61,14 @@ cell(row, col)로 가져오는 값은 다음과 같이 가능하다
     cell.toLocalDdateTime();
 ```
 
-### Run Function
+### Action Function
 
 엑셀은 보통 헤더(=타이틀)을 통해 입력되는 일이 많기 때문에 모든 열을 순회하여 작업할수 있는 함수를 제공합니다
 
 ```java
     SheetReader sheet = new ExcelReader(file).init().sheet();
 
-    List<TestDataModel> result = sheet.run(cells -> new TestDataModel(
+    List<TestDataModel> result = sheet.action(cells -> new TestDataModel(
                     cells.getString("구분"),
                     cells.getString("그룹"),
                     cells.get(4).toString(),
@@ -82,12 +82,34 @@ cell(row, col)로 가져오는 값은 다음과 같이 가능하다
 
 다음과 같인 데이터 클래스를 만들고 필드에 어노테이션을 붙임으로서 리플렉션을 통해 값을 바인딩 할 수 있습니다.
 
-| annotation           | 
-|----------------------|
-| @StringColumn        |
-| @IntegerColumn       |
-| @LocalDateTimeColumn |
+| annotation           | 설명            | 
+|----------------------|---------------|
+| @StringColumn        | 문자형 매핑을 지원합니다 |
+| @NumericColumn       | 숫자형 매핑을 지원합니다 |
+| @LocalDateTimeColumn | 날짜형매핑을 지원합니다  |
 
+**공통 Attribute**
+
+headerIndex : 엑셀의 열을 지정합니다. 기본값은 -1이며 기본값으로 설정되어있다면 Index를 사용하지 않습니다.
+
+headerName : 엑셀 헤더(=타이틀)이름으로 열을 찾아 매핑합니다. Index가 설정되어 있다면 이 값은 무시됩니다.
+
+defaultValue : 찾지 못할 경우 기본값으로 지정할 값입니다.
+
+policy : headerName을 통해 열을 찾지 못했을때 정책을 지정합니다. 기본값은 ERROR입니다.
+```java
+public enum NotFoundHeaderNamePolicy {
+    /**
+     * 헤더명으로 찾지 못한다면 Exception을 발생시킨다
+     */
+    ERROR,
+
+    /**
+     * 헤더명으로 찾지 못한다면 기본값으로 표시한다
+     */
+    DEFAULT_VALUE
+}
+```
 
 ```java
 public class TestDataModel {
@@ -113,4 +135,11 @@ public class TestDataModel {
     @StringColumn(headerName = "유통기한")
     private LocalDate expireDate;
 }
+```
+
+데이터 모델을 만든 이후 다음과 같이 사용합니다.
+
+```java
+SheetReader sheet = new ExcelReader(file).init().sheet();
+List<TestDataModel> result = sheet.action(TestDataModel.class);
 ```
