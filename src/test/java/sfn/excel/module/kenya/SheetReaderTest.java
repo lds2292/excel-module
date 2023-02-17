@@ -53,7 +53,7 @@ class SheetReaderTest {
         try(fileStream) {
             SheetReader sheet = new ExcelReader(fileStream).init().sheet();
             int rownum = 2;
-            for (int i = 0; i < sheet.lastCellNum(rownum); i++) {
+            for (int i = 0; i < sheet.lastCellCount(rownum); i++) {
                 System.out.println(sheet.value(rownum, i));
             }
         }

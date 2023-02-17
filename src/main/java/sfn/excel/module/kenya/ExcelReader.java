@@ -11,7 +11,7 @@ import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
-public class ExcelReader {
+public class ExcelReader implements FileReader {
 
     public static final int FIRST_ROW = 0;
     public static final int FIRST_COL = 0;
@@ -62,6 +62,7 @@ public class ExcelReader {
         }
     }
 
+    @Override
     public ExcelReader init() {
         for (int i = 0; i < this.workBook.getNumberOfSheets(); i++) {
             this.sheetReaderList.add(
@@ -71,8 +72,19 @@ public class ExcelReader {
         return this;
     }
 
-    public Workbook getWorkBook() {
-        return workBook;
+    @Override
+    public SheetReader document() {
+        return this.sheet();
+    }
+
+    @Override
+    public SheetReader document(int index) {
+        return this.sheet(index);
+    }
+
+    @Override
+    public SheetReader document(String name) {
+        return this.sheet(name);
     }
 
     public SheetReader sheet(){
@@ -87,4 +99,5 @@ public class ExcelReader {
         if (sheetIndex == -1 ) throw new NotFoundSheetException(sheetName);
         return this.sheetReaderList.get(sheetIndex);
     }
+
 }
