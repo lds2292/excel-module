@@ -25,7 +25,7 @@ public class Cells {
         return this.columnNames.indexOf(columnName);
     }
 
-    CellValue get(String columnName) {
+    public CellValue get(String columnName) {
         int index = findColumnNameIndex(columnName);
         if (index == -1) return new CellValue();
         return cellValues.get(index);
@@ -37,7 +37,7 @@ public class Cells {
      * @param index 가져올 인덱스
      * @return CellValue
      */
-    CellValue get(int index) {
+    public CellValue get(int index) {
         return cellValues.get(index);
     }
 
@@ -49,11 +49,11 @@ public class Cells {
      * @param columnName 가져올 컬럼명
      * @return String CellValue의 문자열
      */
-    String getString(String columnName) {
+    public String getString(String columnName) {
         return this.get(columnName).toString();
     }
 
-    String getString(int index) {
+    public String getString(int index) {
         return this.get(index).toString();
     }
 
