@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    implementation("sfn", "excel-module", "1.0.116")
+    implementation("sfn", "excel-module", "1.1.2")
 }
 ```
 
