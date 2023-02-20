@@ -152,5 +152,5 @@ public class TestDataModel {
 
 ```java
 SheetReader sheet = new ExcelReader(file).init().sheet();
-List<TestDataModel> result = sheet.action(TestDataModel.class);
+List<TestDataModel> result = sheet.cellMap(TestDataModel.class);
 ```
