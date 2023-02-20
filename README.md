@@ -61,14 +61,16 @@ cell(row, col)로 가져오는 값은 다음과 같이 가능하다
     cell.toLocalDdateTime();
 ```
 
-### Action Function
+### Functions
 
 엑셀은 보통 헤더(=타이틀)을 통해 입력되는 일이 많기 때문에 모든 열을 순회하여 작업할수 있는 함수를 제공합니다
+
+#### CellMap
 
 ```java
     SheetReader sheet = new ExcelReader(file).init().sheet();
 
-    List<TestDataModel> result = sheet.action(cells -> new TestDataModel(
+    List<TestDataModel> result = sheet.cellMap(cells -> new TestDataModel(
                     cells.getString("구분"),
                     cells.getString("그룹"),
                     cells.get(4).toString(),
@@ -78,6 +80,15 @@ cell(row, col)로 가져오는 값은 다음과 같이 가능하다
         cells.get("유통기한").toLocalDate()
         )
     );
+```
+
+#### CellForEach
+```java
+    SheetReader sheet = new ExcelReader(fileStream).init().sheet();
+
+    sheet.cellForEach( cells -> {
+        System.out.println(cells.get("판매자상품번호").toString());
+    });
 ```
 
 다음과 같인 데이터 클래스를 만들고 필드에 어노테이션을 붙임으로서 리플렉션을 통해 값을 바인딩 할 수 있습니다.

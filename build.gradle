@@ -14,13 +14,14 @@ java {
 }
 
 dependencies {
+    implementation 'org.jsoup:jsoup:1.15.3'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testImplementation 'org.assertj:assertj-core:3.21.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 
     // excel
-    api group: "org.apache.poi", name: "poi", version: "4.1.0"
-    api group: "org.apache.poi", name: "poi-ooxml", version: "4.1.0"
+    api group: "org.apache.poi", name: "poi", version: "4.1.2"
+    api group: "org.apache.poi", name: "poi-ooxml", version: "4.1.2"
 }
 
 
