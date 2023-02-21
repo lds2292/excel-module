@@ -1,6 +1,8 @@
 package sfn.excel.module.kenya;
 
-public interface FileReader {
+import java.io.Closeable;
+
+public interface FileReader extends Closeable {
     FileReader init() throws FailedReadFileException;
     DocumentReader document();
     DocumentReader document(int index);

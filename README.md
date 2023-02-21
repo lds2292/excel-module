@@ -14,8 +14,18 @@ repositories {
 }
 
 dependencies {
-    implementation("sfn", "excel-module", "1.1.2")
+    implementation("sfn", "excel-module", "1.1.3")
 }
+```
+
+### Support Factory
+
+파일 시그니처를 확인하여 ExcelReader 또는 HtmlReader를 반환합니다 
+
+```java
+    try (FileReader reader = FileReaderFactory.build(file).init()) {
+        reader.document(); // (=ExcelReader.sheet())
+    }
 ```
 
 ### Read Excel File
@@ -140,7 +150,7 @@ public class TestDataModel {
     @StringColumn(headerName = "바코드", defaultValue = "기본바코드")
     private String barcode;
 
-    @IntegerColumn(headerName = "박스입수")
+    @NumericColumn(headerName = "박스입수")
     private Integer box;
 
     @StringColumn(headerName = "유통기한")

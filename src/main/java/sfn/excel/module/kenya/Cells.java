@@ -64,4 +64,11 @@ public class Cells {
     public List<CellValue> getCellValues() {
         return cellValues;
     }
+
+    @Override
+    public String toString() {
+        return "Cells{" +
+            "cellValues=" + cellValues +
+            '}';
+    }
 }

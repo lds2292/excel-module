@@ -2,8 +2,11 @@ package sfn.excel.module.kenya;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.util.Objects;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -13,8 +16,23 @@ class ExcelReaderTest {
     void passwordFileOpenCheck() throws IOException {
         String password = "1234";
         InputStream fileStream = this.getClass().getResourceAsStream("/ExcelPasswordTest.xlsx");
-        try(fileStream) {
-            new ExcelReader(fileStream, password);
+        try(FileReader reader = new ExcelReader(fileStream, password).init()) {
+            reader.document();
+        }
+    }
+
+    @Test
+    @DisplayName("엑셀파일 열기")
+    void test() throws URISyntaxException, IOException {
+        String password = "1234";
+        File file = new File(Objects.requireNonNull(this.getClass().getResource("/ExcelPasswordTest.xlsx")).toURI());
+        try(FileReader reader = FileReaderFactory.build(file, password)){
+            reader.document().cellForEach(System.out::println);
+        }
+
+        file = new File(Objects.requireNonNull(this.getClass().getResource("/ssg.xls")).toURI());
+        try(FileReader reader = FileReaderFactory.build(file)){
+            reader.document().cellForEach(System.out::println);
         }
     }
 
