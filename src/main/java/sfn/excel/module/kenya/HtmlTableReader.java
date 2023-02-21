@@ -81,7 +81,8 @@ public class HtmlTableReader implements DocumentReader {
         return this.cell(row, col).toString();
     }
 
-    private List<String> getColumnHeaders(int headerRow){
+    @Override
+    public List<String> getColumnHeaders(int headerRow){
         return body.get(headerRow).stream().map(CellValue::toString).collect(
             Collectors.toList());
     }
