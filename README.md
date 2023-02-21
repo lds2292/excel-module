@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    implementation("sfn", "excel-module", "1.0.116")
+    implementation("sfn", "excel-module", "1.1.2")
 }
 ```
 
@@ -152,5 +152,5 @@ public class TestDataModel {
 
 ```java
 SheetReader sheet = new ExcelReader(file).init().sheet();
-List<TestDataModel> result = sheet.action(TestDataModel.class);
+List<TestDataModel> result = sheet.cellMap(TestDataModel.class);
 ```
