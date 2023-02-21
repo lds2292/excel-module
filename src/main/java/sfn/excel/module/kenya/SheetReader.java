@@ -13,7 +13,7 @@ import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
-public class SheetReader {
+public class SheetReader implements DocumentReader {
 
     private final Sheet sheet;
     private final DataFormatter dataFormatter = new DataFormatter();
@@ -27,11 +27,13 @@ public class SheetReader {
         this.defaultDateTimeFormatter = defaultDateTimeFormatter;
     }
 
-    public int lastCellNum(int rownum) {
-        return this.sheet.getRow(rownum).getLastCellNum();
+    @Override
+    public int lastCellCount(int row) {
+        return this.sheet.getRow(row).getLastCellNum();
     }
 
-    public int lastRowNum() {
+    @Override
+    public int lastRowCount() {
         return this.sheet.getLastRowNum();
     }
 
@@ -43,11 +45,13 @@ public class SheetReader {
         return sheet.getLastRowNum() == -1 && sheet.getRow(0) == null;
     }
 
-    public <T> List<T> cellMap(Class<T> clazz) {
-        return this.cellMap(0, clazz);
+    @Override
+    public <T> List<T> classFrom(Class<T> clazz) {
+        return this.classFrom(0, clazz);
     }
 
-    public <T> List<T> cellMap(int headerRow, Class<T> clazz) {
+    @Override
+    public <T> List<T> classFrom(int headerRow, Class<T> clazz) {
         List<String> columnNames = readColumnHeaders(headerRow);
 
         List<T> ret = new ArrayList<>();
@@ -77,6 +81,7 @@ public class SheetReader {
      * @param <R>   반환할 타입
      * @return {@code List<R>} Funtional 함수의 반환값
      */
+    @Override
     public <R> List<R> cellMap(Function<Cells, R> apply) {
         return this.cellMap(0, apply);
     }
@@ -94,6 +99,7 @@ public class SheetReader {
      * @param <T>       반환할 타입
      * @return {@code List<R>} Funtional 함수의 반환값
      */
+    @Override
     public <T> List<T> cellMap(int headerRow, Function<Cells, T> apply) {
         List<String> columnNames = readColumnHeaders(headerRow);
 
@@ -112,10 +118,12 @@ public class SheetReader {
         return ret;
     }
 
+    @Override
     public void cellForEach(Consumer<Cells> consumer){
         cellForEach(0, consumer);
     }
 
+    @Override
     public void cellForEach(int headerRow, Consumer<Cells> consumer){
         List<String> columnNames = readColumnHeaders(headerRow);
 
@@ -148,10 +156,12 @@ public class SheetReader {
         return this.sheet.getRow(row);
     }
 
+    @Override
     public List<CellValue> row(int row) {
         return row(0, row);
     }
 
+    @Override
     public List<CellValue> row(int headerRow, int row) {
         int columnCount = readColumnHeaders(headerRow).size();
         List<CellValue> cells = new ArrayList<>();
@@ -166,6 +176,7 @@ public class SheetReader {
         return this.rowFromSheet(row).getCell(col);
     }
 
+    @Override
     public CellValue cell(int row, int col) {
         Cell cell = this.cellFromRowCol(row, col);
         return new CellValue(
@@ -174,6 +185,7 @@ public class SheetReader {
         );
     }
 
+    @Override
     public String value(int row, int col) {
         Cell cell = this.cellFromRowCol(row, col);
         if (cell == null) {

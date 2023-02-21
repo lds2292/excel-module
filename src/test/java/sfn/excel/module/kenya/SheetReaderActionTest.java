@@ -50,7 +50,7 @@ public class SheetReaderActionTest {
         try(fileStream) {
             SheetReader sheet = new ExcelReader(fileStream).init().sheet();
 
-            List<TestDataModel> result = sheet.cellMap(TestDataModel.class);
+            List<TestDataModel> result = sheet.classFrom(TestDataModel.class);
             result.forEach(System.out::println);
         }
     }

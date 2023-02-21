@@ -1,7 +1,6 @@
 package sfn.excel.module.kenya;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
@@ -11,46 +10,35 @@ import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
-public class ExcelReader {
+public class ExcelReader implements FileReader {
 
-    public static final int FIRST_ROW = 0;
-    public static final int FIRST_COL = 0;
-    public static final int FIRST_SHEET = 0;
+    public static final int DEFAULT_ROW = 0;
+    public static final int DEFAULT_COL = 0;
+    public static final int DEFAULT_SHEET_INDEX = 0;
 
     private final Workbook workBook;
     private List<SheetReader> sheetReaderList = new ArrayList<>();
 
-    private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(
         "yyyy-MM-dd HH:mm:ss");
 
 
     public ExcelReader(File file) throws FailedReadFileException {
-        assert file != null;
-
-        try {
-            this.workBook = WorkbookFactory.create(new FileInputStream(file));
-        } catch (IOException e) {
-            throw new FailedReadFileException(e);
-        }
+        this(file, null);
     }
 
     public ExcelReader(File file, String password) throws FailedReadFileException {
         assert file != null;
 
         try {
-            this.workBook = WorkbookFactory.create(new FileInputStream(file), password);
+            this.workBook = WorkbookFactory.create(file, password);
         } catch (IOException | EncryptedDocumentException e) {
             throw new FailedReadFileException(e);
         }
     }
 
     public ExcelReader(InputStream file) throws FailedReadFileException {
-        assert file != null;
-        try {
-            this.workBook = WorkbookFactory.create(file);
-        } catch (IOException e) {
-            throw new FailedReadFileException(e);
-        }
+        this(file, null);
     }
 
     public ExcelReader(InputStream file, String password) throws FailedReadFileException {
@@ -62,21 +50,37 @@ public class ExcelReader {
         }
     }
 
+    @Override
     public ExcelReader init() {
-        for (int i = 0; i < this.workBook.getNumberOfSheets(); i++) {
-            this.sheetReaderList.add(
-                new SheetReader(this.workBook.getSheetAt(i), this.dateTimeFormatter)
-            );
-        }
+        this.sheetReaderList = createSheetReaders(this.workBook);
         return this;
     }
 
-    public Workbook getWorkBook() {
-        return workBook;
+    private List<SheetReader> createSheetReaders(Workbook workBook) {
+        List<SheetReader> sheetReaders = new ArrayList<>();
+        for (int i = 0; i < workBook.getNumberOfSheets(); i++) {
+            sheetReaders.add(new SheetReader(workBook.getSheetAt(i), this.dateTimeFormatter));
+        }
+        return sheetReaders;
+    }
+
+    @Override
+    public SheetReader document() {
+        return this.sheet();
+    }
+
+    @Override
+    public SheetReader document(int index) {
+        return this.sheet(index);
+    }
+
+    @Override
+    public SheetReader document(String name) {
+        return this.sheet(name);
     }
 
     public SheetReader sheet(){
-        return this.sheetReaderList.get(FIRST_SHEET);
+        return this.sheetReaderList.get(DEFAULT_SHEET_INDEX);
     }
     public SheetReader sheet(int index) {
         return this.sheetReaderList.get(index);
@@ -86,5 +90,10 @@ public class ExcelReader {
         int sheetIndex = this.workBook.getSheetIndex(sheetName);
         if (sheetIndex == -1 ) throw new NotFoundSheetException(sheetName);
         return this.sheetReaderList.get(sheetIndex);
+    }
+
+    @Override
+    public void close() throws IOException {
+        this.workBook.close();
     }
 }
