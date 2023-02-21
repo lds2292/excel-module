@@ -52,7 +52,7 @@ public class SheetReader implements DocumentReader {
 
     @Override
     public <T> List<T> classFrom(int headerRow, Class<T> clazz) {
-        List<String> columnNames = readColumnHeaders(headerRow);
+        List<String> columnNames = getColumnHeaders(headerRow);
 
         List<T> ret = new ArrayList<>();
         int rowCount = this.sheet.getLastRowNum();
@@ -101,7 +101,7 @@ public class SheetReader implements DocumentReader {
      */
     @Override
     public <T> List<T> cellMap(int headerRow, Function<Cells, T> apply) {
-        List<String> columnNames = readColumnHeaders(headerRow);
+        List<String> columnNames = getColumnHeaders(headerRow);
 
         List<T> ret = new ArrayList<>();
         int rowCount = this.sheet.getLastRowNum();
@@ -125,7 +125,7 @@ public class SheetReader implements DocumentReader {
 
     @Override
     public void cellForEach(int headerRow, Consumer<Cells> consumer){
-        List<String> columnNames = readColumnHeaders(headerRow);
+        List<String> columnNames = getColumnHeaders(headerRow);
 
         int rowCount = this.sheet.getLastRowNum();
         int cellCount = columnNames.size();
@@ -139,7 +139,8 @@ public class SheetReader implements DocumentReader {
         }
     }
 
-    private List<String> readColumnHeaders(int headerRow) {
+    @Override
+    public List<String> getColumnHeaders(int headerRow) {
         List<String> columnNames = new ArrayList<>();
         Row headers = this.sheet.getRow(headerRow);
         for (int headerCol = 0; headerCol < headers.getLastCellNum(); headerCol++) {
@@ -163,7 +164,7 @@ public class SheetReader implements DocumentReader {
 
     @Override
     public List<CellValue> row(int headerRow, int row) {
-        int columnCount = readColumnHeaders(headerRow).size();
+        int columnCount = getColumnHeaders(headerRow).size();
         List<CellValue> cells = new ArrayList<>();
         for (int col = 0; col < columnCount; col++) {
             cells.add(this.cell(row, col));

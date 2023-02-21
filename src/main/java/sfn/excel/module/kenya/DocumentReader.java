@@ -28,4 +28,6 @@ public interface DocumentReader {
     CellValue cell(int row, int col);
 
     String value(int row, int col);
+
+    List<String> getColumnHeaders(int headerRow);
 }
