@@ -2,12 +2,12 @@ package sfn.excel.module.kenya;
 
 import java.util.List;
 
-public class Cells {
+public class Row {
 
     private final List<String> columnNames;
     private final List<CellValue> cellValues;
 
-    public Cells(List<String> columnNames, List<CellValue> cellValues) {
+    public Row(List<String> columnNames, List<CellValue> cellValues) {
         this.columnNames = columnNames;
         this.cellValues = cellValues;
     }
@@ -34,11 +34,11 @@ public class Cells {
     /**
      * index로 CellValue를 가져옵니다.
      *
-     * @param index 가져올 인덱스
+     * @param columnIndex 가져올 인덱스
      * @return CellValue
      */
-    public CellValue get(int index) {
-        return cellValues.get(index);
+    public CellValue get(int columnIndex) {
+        return cellValues.get(columnIndex);
     }
 
     /**
@@ -53,8 +53,8 @@ public class Cells {
         return this.get(columnName).toString();
     }
 
-    public String getString(int index) {
-        return this.get(index).toString();
+    public String getString(int columnIndex) {
+        return this.get(columnIndex).toString();
     }
 
     public List<String> getColumnNames() {

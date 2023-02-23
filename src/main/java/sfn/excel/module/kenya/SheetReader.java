@@ -10,8 +10,9 @@ import java.util.function.Function;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.DateUtil;
-import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import sfn.excel.module.kenya.validator.RowValidator;
+import sfn.excel.module.kenya.validator.ValidateResult;
 
 public class SheetReader implements DocumentReader {
 
@@ -62,8 +63,8 @@ public class SheetReader implements DocumentReader {
             for (int col = 0; col < cellCount; col++) {
                 columnList.add(this.cell(row, col));
             }
-            Cells cells = new Cells(columnNames, columnList);
-            ret.add(ClassSupport.createInstance(cells, clazz));
+            Row customRow = new Row(columnNames, columnList);
+            ret.add(ClassSupport.createInstance(customRow, clazz));
         }
 
         return ret;
@@ -74,7 +75,7 @@ public class SheetReader implements DocumentReader {
      * <p>
      * 엑셀의 시작은 두번째 줄부터 시작하며, 첫줄은 Header(=title)로 인식합니다.
      * <p>
-     * {@code Functional<Cells, R>}중 Cells는 Row에 있는 모든 Cell의 정보가 있습니다. 이 Cell의 정보를 사용하여 Cell의 값을 가져올
+     * {@code Functional<Row, R>} Row의 정보를 사용하여 Cell의 값을 가져올
      * 수 있습니다.
      *
      * @param apply 실행할 함수
@@ -82,8 +83,8 @@ public class SheetReader implements DocumentReader {
      * @return {@code List<R>} Funtional 함수의 반환값
      */
     @Override
-    public <R> List<R> cellMap(Function<Cells, R> apply) {
-        return this.cellMap(0, apply);
+    public <R> List<R> rowMap(Function<Row, R> apply) {
+        return this.rowMap(0, apply);
     }
 
     /**
@@ -91,7 +92,7 @@ public class SheetReader implements DocumentReader {
      * <p>
      * 엑셀의 시작은 headerRow+1부터 시작하며, headerRow는 Header(=title)로 인식합니다.
      * <p>
-     * {@code Functional<Cells, R>}중 Cells는 Row에 있는 모든 Cell의 정보가 있습니다. 이 Cell의 정보를 사용하여 Cell의 값을 가져올
+     * {@code Functional<Row, R>} Row의 정보를 사용하여 Cell의 값을 가져올
      * 수 있습니다.
      *
      * @param headerRow header(=title)이 있는 Row 번호 첫줄의 Row Index는 0입니다.
@@ -100,7 +101,7 @@ public class SheetReader implements DocumentReader {
      * @return {@code List<R>} Funtional 함수의 반환값
      */
     @Override
-    public <T> List<T> cellMap(int headerRow, Function<Cells, T> apply) {
+    public <T> List<T> rowMap(int headerRow, Function<Row, T> apply) {
         List<String> columnNames = getColumnHeaders(headerRow);
 
         List<T> ret = new ArrayList<>();
@@ -111,20 +112,20 @@ public class SheetReader implements DocumentReader {
             for (int col = 0; col < cellCount; col++) {
                 columnList.add(this.cell(row, col));
             }
-            Cells cells = new Cells(columnNames, columnList);
-            ret.add(apply.apply(cells));
+            Row customRow = new Row(columnNames, columnList);
+            ret.add(apply.apply(customRow));
         }
 
         return ret;
     }
 
     @Override
-    public void cellForEach(Consumer<Cells> consumer){
-        cellForEach(0, consumer);
+    public void rowForEach(Consumer<Row> consumer){
+        rowForEach(0, consumer);
     }
 
     @Override
-    public void cellForEach(int headerRow, Consumer<Cells> consumer){
+    public void rowForEach(int headerRow, Consumer<Row> consumer){
         List<String> columnNames = getColumnHeaders(headerRow);
 
         int rowCount = this.sheet.getLastRowNum();
@@ -134,15 +135,15 @@ public class SheetReader implements DocumentReader {
             for (int col = 0; col < cellCount; col++) {
                 columnList.add(this.cell(row, col));
             }
-            Cells cells = new Cells(columnNames, columnList);
-            consumer.accept(cells);
+            Row customRow = new Row(columnNames, columnList);
+            consumer.accept(customRow);
         }
     }
 
     @Override
     public List<String> getColumnHeaders(int headerRow) {
         List<String> columnNames = new ArrayList<>();
-        Row headers = this.sheet.getRow(headerRow);
+        org.apache.poi.ss.usermodel.Row headers = this.sheet.getRow(headerRow);
         for (int headerCol = 0; headerCol < headers.getLastCellNum(); headerCol++) {
             columnNames.add(this.value(headerRow, headerCol));
         }
@@ -153,7 +154,7 @@ public class SheetReader implements DocumentReader {
         return this.value(cell.getRowIndex(), cell.getColumnIndex());
     }
 
-    private Row rowFromSheet(int row) {
+    private org.apache.poi.ss.usermodel.Row rowFromSheet(int row) {
         return this.sheet.getRow(row);
     }
 
@@ -165,12 +166,12 @@ public class SheetReader implements DocumentReader {
     @Override
     public List<CellValue> row(int headerRow, int row) {
         int columnCount = getColumnHeaders(headerRow).size();
-        List<CellValue> cells = new ArrayList<>();
+        List<CellValue> customRow = new ArrayList<>();
         for (int col = 0; col < columnCount; col++) {
-            cells.add(this.cell(row, col));
+            customRow.add(this.cell(row, col));
         }
 
-        return cells;
+        return customRow;
     }
 
     private Cell cellFromRowCol(int row, int col) {
@@ -235,6 +236,32 @@ public class SheetReader implements DocumentReader {
             default:
                 return dataFormatter.formatCellValue(cell);
         }
+    }
+
+
+    @Override
+    public List<ValidateResult> validate(int headerRow, RowValidator validator) {
+        List<String> columnNames = getColumnHeaders(headerRow);
+
+        int rowCount = this.sheet.getLastRowNum();
+        int cellCount = columnNames.size();
+
+        List<ValidateResult> ret = new ArrayList<>();
+        for (int rowIndex = headerRow + 1; rowIndex <= rowCount; rowIndex++) {
+            List<CellValue> columnList = new ArrayList<>();
+            for (int col = 0; col < cellCount; col++) {
+                columnList.add(this.cell(rowIndex, col));
+            }
+            Row customRow = new Row(columnNames, columnList);
+            ret.addAll(validator.validate(rowIndex, customRow));
+        }
+
+        return ret;
+    }
+
+    @Override
+    public List<ValidateResult> validate(RowValidator validator) {
+        return this.validate(0, validator);
     }
 }
 
