@@ -1,5 +1,10 @@
 package sfn.excel.module.kenya;
 
+import sfn.excel.module.kenya.annotation.LocalDateTimeColumn;
+import sfn.excel.module.kenya.annotation.NotFoundHeaderNamePolicy;
+import sfn.excel.module.kenya.annotation.NumericColumn;
+import sfn.excel.module.kenya.annotation.StringColumn;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -7,14 +12,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import sfn.excel.module.kenya.annotation.LocalDateTimeColumn;
-import sfn.excel.module.kenya.annotation.NotFoundHeaderNamePolicy;
-import sfn.excel.module.kenya.annotation.NumericColumn;
-import sfn.excel.module.kenya.annotation.StringColumn;
 
 public class ClassSupport {
 
-    public static <T> T createInstance(Cells cells, Class<T> clazz) {
+    public static <T> T createInstance(Row cells, Class<T> clazz) {
         Constructor<T> constructor = null;
         try {
             constructor = clazz.getDeclaredConstructor();
@@ -38,7 +39,7 @@ public class ClassSupport {
         }
     }
 
-    private static <T> void mappingColumn(T instance, Cells cells, Field field) {
+    private static <T> void mappingColumn(T instance, Row cells, Field field) {
         field.setAccessible(true);
         try {
             StringColumn stringColumnAnn = field.getAnnotation(StringColumn.class);
@@ -70,7 +71,7 @@ public class ClassSupport {
         }
     }
 
-    private static <T> void setNumericFieldValue(T instance, Field field, Cells cells,
+    private static <T> void setNumericFieldValue(T instance, Field field, Row cells,
         NumericColumn ann) throws IllegalAccessException {
         Class<?> type = field.getType();
         Double value = getNumericFieldValue(cells, ann);
@@ -85,7 +86,7 @@ public class ClassSupport {
         }
     }
 
-    private static double getNumericFieldValue(Cells cells, NumericColumn ann) {
+    private static double getNumericFieldValue(Row cells, NumericColumn ann) {
         if (ann.headerIndex() > -1) {
             return cells.get(ann.headerIndex()).toDouble(ann.defaultValue());
         }
@@ -98,7 +99,7 @@ public class ClassSupport {
         return ann.defaultValue();
     }
 
-    private static String getStringFieldValue(Cells cells, StringColumn ann) {
+    private static String getStringFieldValue(Row cells, StringColumn ann) {
         if (ann.headerIndex() > -1) {
             String value = cells.getString(ann.headerIndex());
             if (!ann.defaultValue().isBlank() && value.isBlank()) {
@@ -120,7 +121,7 @@ public class ClassSupport {
         return ann.defaultValue();
     }
 
-    private static <T> void setLocalDateTimeFieldValue(T instance, Field field, Cells cells, LocalDateTimeColumn ann)
+    private static <T> void setLocalDateTimeFieldValue(T instance, Field field, Row cells, LocalDateTimeColumn ann)
         throws IllegalAccessException {
         String value = "";
         if (ann.headerIndex() > -1) {
@@ -163,7 +164,7 @@ public class ClassSupport {
         }
     }
 
-    private static <T> void setStringFieldValue(T instance, Field field, Cells cells,
+    private static <T> void setStringFieldValue(T instance, Field field, Row cells,
         StringColumn ann) throws IllegalAccessException {
         Class<?> type = field.getType();
         String value = getStringFieldValue(cells, ann);
@@ -182,7 +183,7 @@ public class ClassSupport {
         }
     }
 
-    private static void validateHeaderNamePolicy(Cells cells, String headerName, NotFoundHeaderNamePolicy policy) {
+    private static void validateHeaderNamePolicy(Row cells, String headerName, NotFoundHeaderNamePolicy policy) {
         if (policy.equals(NotFoundHeaderNamePolicy.ERROR) && cells.findColumnNameIndex(headerName) == -1){
             throw new InstanceClassException("Header Name("+ headerName+")을 찾을 수 없습니다", null);
         }

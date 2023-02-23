@@ -59,7 +59,7 @@ public class ExcelReader implements FileReader {
     private List<SheetReader> createSheetReaders(Workbook workBook) {
         List<SheetReader> sheetReaders = new ArrayList<>();
         for (int i = 0; i < workBook.getNumberOfSheets(); i++) {
-            sheetReaders.add(new SheetReader(workBook.getSheetAt(i), this.dateTimeFormatter));
+            sheetReaders.add(new SheetReader(workBook.getSheetAt(i), dateTimeFormatter));
         }
         return sheetReaders;
     }

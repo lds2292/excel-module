@@ -1,9 +1,12 @@
 package sfn.excel.module.kenya;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import sfn.excel.module.kenya.validator.RowValidator;
+import sfn.excel.module.kenya.validator.ValidateResult;
 
 public class HtmlTableReader implements DocumentReader {
     private final List<List<CellValue>> body;
@@ -30,34 +33,34 @@ public class HtmlTableReader implements DocumentReader {
     @Override
     public <T> List<T> classFrom(int headerRow, Class<T> clazz) {
         return body.stream().skip(headerRow + 1).map(row -> {
-            Cells cells = new Cells(getColumnHeaders(headerRow), row);
-            return ClassSupport.createInstance(cells, clazz);
+            Row customRow = new Row(getColumnHeaders(headerRow), row);
+            return ClassSupport.createInstance(customRow, clazz);
         }).collect(Collectors.toList());
     }
 
     @Override
-    public <R> List<R> cellMap(Function<Cells, R> apply) {
-        return this.cellMap(0, apply);
+    public <R> List<R> rowMap(Function<Row, R> apply) {
+        return this.rowMap(0, apply);
     }
 
     @Override
-    public <T> List<T> cellMap(int headerRow, Function<Cells, T> apply) {
+    public <T> List<T> rowMap(int headerRow, Function<Row, T> apply) {
         return body.stream().skip(headerRow + 1).map(row -> {
-            Cells cells = new Cells(getColumnHeaders(headerRow), row);
-            return apply.apply(cells);
+            Row customRow = new Row(getColumnHeaders(headerRow), row);
+            return apply.apply(customRow);
         }).collect(Collectors.toList());
     }
 
     @Override
-    public void cellForEach(Consumer<Cells> consumer) {
-        this.cellForEach(0, consumer);
+    public void rowForEach(Consumer<Row> consumer) {
+        this.rowForEach(0, consumer);
     }
 
     @Override
-    public void cellForEach(int headerRow, Consumer<Cells> consumer) {
+    public void rowForEach(int headerRow, Consumer<Row> consumer) {
         body.stream().skip(headerRow + 1).forEach(row -> {
-            Cells cells = new Cells(getColumnHeaders(headerRow), row);
-            consumer.accept(cells);
+            Row customRow = new Row(getColumnHeaders(headerRow), row);
+            consumer.accept(customRow);
         });
     }
 
@@ -85,5 +88,22 @@ public class HtmlTableReader implements DocumentReader {
     public List<String> getColumnHeaders(int headerRow){
         return body.get(headerRow).stream().map(CellValue::toString).collect(
             Collectors.toList());
+    }
+
+    @Override
+    public List<ValidateResult> validate(RowValidator validator) {
+        return this.validate(0, validator);
+    }
+
+    @Override
+    public List<ValidateResult> validate(int headerRow, RowValidator validator) {
+
+        List<String> columnHeaders = getColumnHeaders(headerRow);
+        List<ValidateResult> ret = new ArrayList<>();
+        for (int rowIndex = headerRow + 1; rowIndex < body.size(); rowIndex++) {
+            Row customRow = new Row(columnHeaders, body.get(rowIndex));
+            ret.addAll(validator.validate(rowIndex, customRow));
+        }
+        return ret;
     }
 }

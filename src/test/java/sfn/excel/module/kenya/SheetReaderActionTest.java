@@ -1,12 +1,13 @@
 package sfn.excel.module.kenya;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class SheetReaderActionTest {
     @Test
@@ -16,7 +17,7 @@ public class SheetReaderActionTest {
         try(fileStream) {
             SheetReader sheet = new ExcelReader(fileStream).init().sheet();
 
-            List<TestDataModel> result = sheet.cellMap(cells -> new TestDataModel(
+            List<TestDataModel> result = sheet.rowMap(cells -> new TestDataModel(
                     cells.getString("구분"),
                     cells.getString("그룹"),
                     cells.get(4).toString(),
@@ -38,7 +39,7 @@ public class SheetReaderActionTest {
         try(fileStream) {
             SheetReader sheet = new ExcelReader(fileStream).init().sheet();
 
-            List<String> kinds = sheet.cellMap(cells -> cells.get("구분").toString());
+            List<String> kinds = sheet.rowMap(cells -> cells.get("구분").toString());
             assertThat(kinds.size()).isEqualTo(12);
         }
     }

@@ -1,14 +1,15 @@
 package sfn.excel.module.kenya;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.Objects;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ExcelReaderTest {
     @Test
@@ -27,12 +28,12 @@ class ExcelReaderTest {
         String password = "1234";
         File file = new File(Objects.requireNonNull(this.getClass().getResource("/ExcelPasswordTest.xlsx")).toURI());
         try(FileReader reader = FileReaderFactory.build(file, password)){
-            reader.document().cellForEach(System.out::println);
+            reader.document().rowForEach(System.out::println);
         }
 
         file = new File(Objects.requireNonNull(this.getClass().getResource("/ssg.xls")).toURI());
         try(FileReader reader = FileReaderFactory.build(file)){
-            reader.document().cellForEach(System.out::println);
+            reader.document().rowForEach(System.out::println);
         }
     }
 
