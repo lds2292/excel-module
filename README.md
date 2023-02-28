@@ -235,6 +235,26 @@ public class CustomValidator extends AbstractCustomValidator{
 }
 ```
 
+직접 Validator를 구성한다면 익명클래스로 작성하여도 됩니다
+
+```java
+ValidatorChain validatorChain = new ValidatorChain()
+    .addValidator(new AbstractCustomValidator("컬럼1") {
+        @Override
+        protected boolean validateValue(String value) {
+            // 컬럼1 value에 대한 유효성 검사
+        }
+    })
+    .addValidator(new RowValidator() {
+        @Override
+        public List<ValidateResult> validate(int rowIndex, Row row) {
+            // 직접 Col value를 찾아서 유효성 검사
+        }
+    });
+```
+
+
+
 ## ValidatorChain
 
 행에 대해서 여러가지 유효성을 검사해야한다면 `ValidatorChain`을 사용하면 됩니다. RowValidator를 구현한 메서드를 등록하여 순차적으로 검사할 수 있습니다.
