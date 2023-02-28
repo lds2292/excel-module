@@ -217,7 +217,7 @@ ValidateResult{row=3, col=0, headerName='컬럼1', value='', message='필수값�
 
 기본으로 제공하는 Validator 이외에 직접 유효성 검사기를 만들어야한다면, `AbstractCustomValidator`을 확장하여 `validateValue` 메서드를 구현합니다.
 
-유효성 검사후 문제가 있다면 `ValidateResult`를 반환해주고 문제가 없다면 `null`을 반환해야합니다.
+`validateValue` 메서드의 반환값이 `true`라면 에러를 반환하게 됩니다.
 
 아래코드는 조건으로 입력한 열이 값1인지 체크하는 유효성 검사기 입니다.
 
