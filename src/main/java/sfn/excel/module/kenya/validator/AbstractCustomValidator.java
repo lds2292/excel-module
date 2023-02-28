@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import sfn.excel.module.kenya.Row;
 
@@ -58,20 +57,24 @@ public abstract class AbstractCustomValidator implements RowValidator {
         }
     }
 
-    protected List<ValidateResult> columnIndexValidate(Function<Integer, ValidateResult> func){
+    private List<ValidateResult> validateColumnIndex(int rowIndex, Row row){
         return columnIndexes.stream()
-            .map(func)
-            .filter(Objects::nonNull)
+            .map( columnIndex -> {
+                String headerName = row.getColumnNames().get(columnIndex);
+                String value = row.getString(columnIndex);
+                return validateValue(value, rowIndex, columnIndex, headerName);
+            }).filter(Objects::nonNull)
             .collect(Collectors.toList());
     }
-
-    protected List<ValidateResult> headerNameValidate(Function<String, ValidateResult> func){
+    private List<ValidateResult> validateHeaderName(int rowIndex, Row row){
         return headerNames.stream()
-            .map(func)
-            .filter(Objects::nonNull)
+            .map(headerName -> {
+                int columnIndex = row.getColumnNames().indexOf(headerName);
+                String value = row.getString(columnIndex);
+                return validateValue(value, rowIndex, columnIndex, headerName);
+            }).filter(Objects::nonNull)
             .collect(Collectors.toList());
     }
 
-    abstract protected List<ValidateResult> validateColumnIndex(int rowIndex, Row row);
-    abstract protected List<ValidateResult> validateHeaderName(int rowIndex, Row row);
+    abstract protected ValidateResult validateValue(String value, int rowIndex, int columnIndex, String headerName);
 }

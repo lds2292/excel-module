@@ -1,8 +1,5 @@
 package sfn.excel.module.kenya.validator;
 
-import java.util.List;
-import sfn.excel.module.kenya.Row;
-
 public class NumericValidator extends AbstractCustomValidator implements RowValidator {
 
     private static final String ERROR_MESSAGE = "숫자값이 아닙니다";
@@ -22,36 +19,14 @@ public class NumericValidator extends AbstractCustomValidator implements RowVali
     }
 
     @Override
-    final protected List<ValidateResult> validateColumnIndex(int rowIndex, Row row) {
-        return columnIndexValidate(columnIndex -> {
-            String headerName = row.getColumnNames().get(columnIndex);
-            String value = row.getString(columnIndex);
-            return validateNumeric(value)
-                ? new ValidateResult(rowIndex, columnIndex, headerName, value, errorMessage)
-                : null;
-        });
-    }
-    @Override
-    final protected List<ValidateResult> validateHeaderName(int rowIndex, Row row) {
-        return headerNameValidate(headerName -> {
-            int columnIndex = row.getColumnNames().indexOf(headerName);
-            String value = row.getString(columnIndex);
-            return validateNumeric(value)
-                ? new ValidateResult(rowIndex, columnIndex, headerName, row.getString(headerName),
-                errorMessage)
-                : null;
-        });
-    }
-
-    private boolean validateNumeric(String value) {
-        if (value.isBlank()) return true;
+    final protected ValidateResult validateValue(String value, int rowIndex, int columnIndex, String headerName) {
+        if (value.isBlank()) return new ValidateResult(rowIndex, columnIndex, headerName, value, errorMessage);
         try {
             Double.parseDouble(value);
-            return false;
+            return null;
         } catch (NumberFormatException e) {
-            return true;
+            return new ValidateResult(rowIndex, columnIndex, headerName, value, errorMessage);
         }
-
     }
 
 }

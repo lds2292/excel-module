@@ -215,12 +215,11 @@ ValidateResult{row=3, col=0, headerName='컬럼1', value='', message='필수값�
 
 ### CustomValidator
 
-기본으로 제공하는 Validator 이외에 직접 유효성 검사기를 만들어야한다면, `AbstractCustomValidator`을 확장하여 구현합니다.
+기본으로 제공하는 Validator 이외에 직접 유효성 검사기를 만들어야한다면, `AbstractCustomValidator`을 확장하여 `validateValue` 메서드를 구현합니다.
+
+유효성 검사후 문제가 있다면 `ValidateResult`를 반환해주고 문제가 없다면 `null`을 반환해야합니다.
 
 아래코드는 조건으로 입력한 열이 값1인지 체크하는 유효성 검사기 입니다.
-
-`columnIndexValidate` 또는 `headerNameValidate`을 사용하면 `null`을 제외한 `ValidateResult`만 반환합니다. 
-
 
 ```java
 public class CustomValidator extends AbstractCustomValidator{
@@ -230,28 +229,15 @@ public class CustomValidator extends AbstractCustomValidator{
     }
 
     @Override
-    protected List<ValidateResult> validateColumnIndex(int rowIndex, Row row) {
-        return columnIndexValidate(colIndex -> {
-            String value = row.getString(colIndex);
-            String headerName = row.getColumnNames().get(colIndex);
-            return value != "값1" ? new ValidateResult(rowIndex, colIndex, headerName, value, errorMessage) : null;
-        });
-    }
-
-    @Override
-    protected List<ValidateResult> validateHeaderName(int rowIndex, Row row) {
-        return headerNameValidate(headerName -> {
-            String value = row.getString(headerName);
-            int colIndex = row.getColumnNames().indexOf(headerName);
-            return value != "값1" ? new ValidateResult(rowIndex, colIndex, headerName, value, errorMessage) : null;
-        });
+    final protected ValidateResult validateValue(String value, int rowIndex, int columnIndex, String headerName) {
+        return value != "값1" ? new ValidateResult(rowIndex, colIndex, headerName, value, errorMessage) : null;
     }
 }
 ```
 
 ## ValidatorChain
 
-한 열에 대해서 여러가지 유효성을 검사해야한다면 `ValidatorChain`을 사용하면 됩니다. RowValidator를 구현한 메서드를 등록하여 순차적으로 검사할 수 있습니다.
+행에 대해서 여러가지 유효성을 검사해야한다면 `ValidatorChain`을 사용하면 됩니다. RowValidator를 구현한 메서드를 등록하여 순차적으로 검사할 수 있습니다.
 
 `Factory`를 사용하여 `RequiredValidator`를 기본으로 반환받을 수 있습니다.
 

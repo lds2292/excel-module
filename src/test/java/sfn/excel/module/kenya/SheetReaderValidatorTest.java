@@ -50,8 +50,7 @@ class SheetReaderValidatorTest {
         try(fileStream) {
             SheetReader sheet = new ExcelReader(fileStream).init().sheet();
 
-            NumericValidator numericValidator = new NumericValidator();
-            numericValidator.addColumnIndex(0);
+            NumericValidator numericValidator = new NumericValidator(0);
 
             List<ValidateResult> validate = sheet.validate(numericValidator);
             assertThat(validate.size()).isEqualTo(9);
