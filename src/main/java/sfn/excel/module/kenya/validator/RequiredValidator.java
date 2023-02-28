@@ -14,9 +14,7 @@ public class RequiredValidator extends AbstractCustomValidator {
     }
 
     @Override
-    protected ValidateResult validateValue(String value, int rowIndex, int columnIndex, String headerName) {
-        return value.isBlank()
-            ? new ValidateResult(rowIndex, columnIndex, headerName, value, errorMessage)
-            : null;
+    protected boolean validateValue(String value) {
+        return value.isBlank();
     }
 }

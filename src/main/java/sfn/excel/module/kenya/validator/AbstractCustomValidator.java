@@ -62,7 +62,7 @@ public abstract class AbstractCustomValidator implements RowValidator {
             .map( columnIndex -> {
                 String headerName = row.getColumnNames().get(columnIndex);
                 String value = row.getString(columnIndex);
-                return validateValue(value, rowIndex, columnIndex, headerName);
+                return validateValue(value) ? new ValidateResult(rowIndex, columnIndex, headerName, value, errorMessage) : null;
             }).filter(Objects::nonNull)
             .collect(Collectors.toList());
     }
@@ -71,10 +71,14 @@ public abstract class AbstractCustomValidator implements RowValidator {
             .map(headerName -> {
                 int columnIndex = row.getColumnNames().indexOf(headerName);
                 String value = row.getString(columnIndex);
-                return validateValue(value, rowIndex, columnIndex, headerName);
+                return validateValue(value) ? new ValidateResult(rowIndex, columnIndex, headerName, value, errorMessage) : null;
             }).filter(Objects::nonNull)
             .collect(Collectors.toList());
     }
 
-    abstract protected ValidateResult validateValue(String value, int rowIndex, int columnIndex, String headerName);
+    /**
+     * @param value 셀의 값이 입력됩니다
+     * @return true일 경우에 오류입니다.
+     */
+    abstract protected boolean validateValue(String value);
 }

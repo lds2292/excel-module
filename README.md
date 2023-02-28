@@ -229,8 +229,8 @@ public class CustomValidator extends AbstractCustomValidator{
     }
 
     @Override
-    final protected ValidateResult validateValue(String value, int rowIndex, int columnIndex, String headerName) {
-        return value != "값1" ? new ValidateResult(rowIndex, colIndex, headerName, value, errorMessage) : null;
+    final protected boolean validateValue(String value) {
+        return value != "값1";
     }
 }
 ```

@@ -19,13 +19,13 @@ public class NumericValidator extends AbstractCustomValidator implements RowVali
     }
 
     @Override
-    final protected ValidateResult validateValue(String value, int rowIndex, int columnIndex, String headerName) {
-        if (value.isBlank()) return new ValidateResult(rowIndex, columnIndex, headerName, value, errorMessage);
+    final protected boolean validateValue(String value) {
+        if (value.isBlank()) return true;
         try {
             Double.parseDouble(value);
-            return null;
+            return false;
         } catch (NumberFormatException e) {
-            return new ValidateResult(rowIndex, columnIndex, headerName, value, errorMessage);
+            return true;
         }
     }
 
