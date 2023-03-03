@@ -1,9 +1,4 @@
-package sfn.excel.module.kenya;
-
-import sfn.excel.module.kenya.annotation.LocalDateTimeColumn;
-import sfn.excel.module.kenya.annotation.NotFoundHeaderNamePolicy;
-import sfn.excel.module.kenya.annotation.NumericColumn;
-import sfn.excel.module.kenya.annotation.StringColumn;
+package sfn.excel.module.kenya.support;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -12,6 +7,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import sfn.excel.module.kenya.Row;
+import sfn.excel.module.kenya.annotation.LocalDateTimeColumn;
+import sfn.excel.module.kenya.annotation.NotFoundHeaderNamePolicy;
+import sfn.excel.module.kenya.annotation.NumericColumn;
+import sfn.excel.module.kenya.annotation.StringColumn;
+import sfn.excel.module.kenya.exception.InstanceClassException;
 
 public class ClassSupport {
 

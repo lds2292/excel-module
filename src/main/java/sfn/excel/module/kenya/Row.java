@@ -21,7 +21,7 @@ public class Row {
      * @return CellValue
      */
 
-    int findColumnNameIndex(String columnName) {
+    public int findColumnNameIndex(String columnName) {
         return this.columnNames.indexOf(columnName);
     }
 
