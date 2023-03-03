@@ -1,14 +1,18 @@
 package sfn.excel.module.kenya;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import sfn.excel.module.kenya.exception.FailedReadFileException;
+import sfn.excel.module.kenya.exception.NotFoundSheetException;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import static sfn.excel.module.kenya.support.DateTypeNormalizer.dateTimeFormatter;
 
 public class ExcelReader implements FileReader {
 
@@ -18,9 +22,6 @@ public class ExcelReader implements FileReader {
 
     private final Workbook workBook;
     private List<SheetReader> sheetReaderList = new ArrayList<>();
-
-    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(
-        "yyyy-MM-dd HH:mm:ss");
 
 
     public ExcelReader(File file) throws FailedReadFileException {

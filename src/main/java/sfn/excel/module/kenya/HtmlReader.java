@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import sfn.excel.module.kenya.exception.FailedReadFileException;
 
 public class HtmlReader implements FileReader{
 

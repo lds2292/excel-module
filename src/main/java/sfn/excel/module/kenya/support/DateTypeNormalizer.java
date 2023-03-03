@@ -1,4 +1,6 @@
-package sfn.excel.module.kenya;
+package sfn.excel.module.kenya.support;
+
+import java.time.format.DateTimeFormatter;
 
 public class DateTypeNormalizer {
 
@@ -8,6 +10,9 @@ public class DateTypeNormalizer {
 
     public static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     public static final String DATE_FORMAT = "yyyy-MM-dd";
+
+    public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATETIME_FORMAT);
+    public static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
     public static String edit(String datetimeString){
         String replaceValue = datetimeString

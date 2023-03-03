@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.Test;
+import sfn.excel.module.kenya.exception.InstanceClassException;
 
 public class HtmlReaderTest {
 

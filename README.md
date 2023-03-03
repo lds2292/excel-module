@@ -20,6 +20,8 @@ dependencies {
 }
 ```
 
+# Reader
+
 ## Support Factory
 
 파일 시그니처를 확인하여 ExcelReader 또는 HtmlReader를 반환합니다 
@@ -281,4 +283,69 @@ List<ValidateResult> validate = sheet.validate(validatorChain);
 ValidatorChain validatorChain = ValidatorChainFactory.withRequiredValidator("컬럼1")
     .addValidator(new NumericValidator("컬럼2"));
 List<ValidateResult> validate = sheet.validate(validatorChain);
+```
+
+# Writer
+
+## Write Excel With Class
+
+클래스에 엑셀 변환에 대한 메타어노테이션을 설정하여 간편하게 엑셀파일을 만들 수 있습니다.
+
+다음과 같이 클래스를 만듭니다. 보통 엑셀을 만들기 위하여 `Repository`에서 데이터를 가져오거나 하여 `Data Class`을 만들기 떄문에 해당 클래스에 `ExcelSupport` 인터페이스를 붙여줍니다.
+`ExcelSupport` 인터페이스는 따로 구현할 메서드가 없으며 이 클래스는 Excel Export 될수 있다는것만 명시해 주는 역할 입니다. 물론 `ExcelWriter`에서 `write` 메서드 호출시 `ExcelSupport` 인터페이스를 구현하고 있어야 생성할 수 있습니다.
+
+```java
+// 클래스 생성(ExcelSupport 필요)
+public class DataModel implements ExcelSupport{
+    @ExcelExport(order = 1, name = "이름", defaultValue = "이름 기본값")
+    private String name;
+    @ExcelExport(order = 0, name = "주소", defaultValue = "주소 기본값")
+    private String address;
+
+    @ExcelExport(order = 2, name = "수량", defaultValue = "0")
+    private Integer quantity;
+
+    @ExcelExport(order = 3, name = "가격", defaultValue = "0")
+    private Double amount;
+
+    @ExcelExport(order = 4, name = "요청일")
+    private LocalDate requestDate;
+
+    @ExcelExport(order = 5, name = "요청일시")
+    private LocalDateTime requestDateTime;
+
+    // Getter 및 Constructor 생략
+}
+
+// 엑셀 생성
+ExcelWriter writer = new ExcelWriter("MySheet");
+List<DataModel> res = SomthingRepository.findAll();
+String path = writer.write(res);
+```
+
+## ExcelExport Annotation
+
+엑셀로 변환하고자 하는 필드위에 `@ExcelExport` 어노테이션을 붙여주게 되면 해당 필드의 값은 엑셀로 Export할 수 있습니다. 어노테이션이 붙지 않는 필드는 엑셀 입력에서 제외 됩니다.
+
+|     attr     | description                                                                           |
+|:------------:|---------------------------------------------------------------------------------------|
+|    order     | 엑셀 몇번째 열에 입력할지 정합니다. 엑셀 첫번째 열의 Index는 0 입니다. 중복되는 Index가 있다면 후순위에 있는 데이터로 덮어씌우게 됩니다.  |
+|     name     | 해당 값의 HeaderName을 지정합니다.                                                              |
+| defaultvalue | 만약 해당값이 Null이라면 대체할 기본값을 지정합니다. LocalDate, LocalDateTime의 경우에는 Default 값을 지정해도 무시됩니다. |
+
+## Custom Write
+
+클래스 지정 Excel Export가 아닌 직접 제어하기 위해서는 다음과 같이 `BiConsumer Functional Interface`를 구현합니다.
+
+```java
+ExcelWriter writer = new ExcelWriter("나의시트");
+String path = writer.write((wb, sheet) -> {
+    for (int i = 0; i < 1000; i++){
+        Row row = sheet.createRow(i);
+        for (int j = 0; j < 10; j++) {
+            Cell cell = row.createCell(j);
+            cell.setCellValue(i +"/"+ j);
+        }
+    }
+});
 ```

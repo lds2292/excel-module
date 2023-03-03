@@ -1,4 +1,4 @@
-package sfn.excel.module.kenya;
+package sfn.excel.module.kenya.exception;
 
 public class FailedParseException extends RuntimeException{
 
